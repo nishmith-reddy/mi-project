@@ -1,0 +1,3607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LearnHub - Advanced E-Learning Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    /* All previous CSS styles remain the same */
+    :root {
+      --primary: #4361ee;
+      --secondary: #3a0ca3;
+      --success: #4cc9f0;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --danger: #e63946;
+      --warning: #fca311;
+      --info: #4895ef;
+    }
+    
+    body { 
+      background-color: #f7f9fc; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding-top: 80px; /* Added padding to prevent content from being hidden behind navbar */
+    }
+    
+    .hidden { display: none; }
+    
+    .card-img-top { 
+      height: 200px; 
+      object-fit: cover; 
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover .card-img-top {
+      transform: scale(1.05);
+    }
+    
+    .cart-icon { 
+      position: relative; 
+      cursor: pointer; 
+    }
+    
+    .cart-badge { 
+      position: absolute; 
+      top: -5px; 
+      right: -10px; 
+      background-color: var(--danger); 
+      color: white; 
+      border-radius: 50%; 
+      padding: 3px 7px; 
+      font-size: 12px; 
+    }
+    
+    .video-lecture { 
+      width: 100%; 
+      max-width: 700px; 
+      height: auto; 
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    header, footer { 
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white; 
+      padding: 1rem; 
+    }
+    
+    footer { text-align: center; }
+    
+    .text-black-bg { 
+      background-color: #000; 
+      color: #fff; 
+    }
+    
+    .hero-section {
+      background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      padding: 5rem 0;
+      border-radius: 0 0 30px 30px;
+      margin-bottom: 3rem;
+      margin-top: -80px; /* Compensate for body padding */
+    }
+    
+    .feature-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: none;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    
+    .progress-bar-custom {
+      background: linear-gradient(to right, var(--primary), var(--success));
+      border-radius: 10px;
+    }
+    
+    .course-card {
+      transition: all 0.3s ease;
+      border: none;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      height: 100%;
+    }
+    
+    .course-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .course-description {
+      display: -webkit-box;
+      -webkit-line-clamp: 3; /* Limit to 3 lines */
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: 4.5em; /* Approximately 3 lines of text */
+    }
+    
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: none;
+      border-radius: 50px;
+      padding: 10px 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary-custom:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 7px 15px rgba(67, 97, 238, 0.4);
+    }
+    
+    .navbar-custom {
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .navbar-custom.scrolled {
+      background: white !important;
+      padding: 0.5rem 0;
+    }
+    
+    .nav-link-custom {
+      color: var(--dark) !important;
+      font-weight: 500;
+      position: relative;
+      margin: 0 5px;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-link-custom:hover, .nav-link-custom.active {
+      color: var(--primary) !important;
+      background-color: rgba(67, 97, 238, 0.1);
+    }
+    
+    .nav-link-custom::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 50%;
+      background-color: var(--primary);
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+    
+    .nav-link-custom:hover::after, .nav-link-custom.active::after {
+      width: 80%;
+    }
+    
+    .category-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--primary);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .search-box {
+      border-radius: 50px;
+      border: 2px solid #e9ecef;
+      padding: 10px 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .search-box:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+    }
+    
+    .stats-card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+    
+    .stats-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .stats-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0;
+    }
+    
+    .stats-label {
+      color: #6c757d;
+      font-weight: 500;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin-right: 10px;
+    }
+    
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: var(--danger);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .progress-container {
+      background-color: #e9ecef;
+      border-radius: 10px;
+      height: 10px;
+      margin: 10px 0;
+    }
+    
+    .progress-bar {
+      border-radius: 10px;
+      height: 100%;
+      background: linear-gradient(to right, var(--primary), var(--success));
+    }
+    
+    .quiz-option {
+      padding: 15px;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .quiz-option:hover {
+      border-color: var(--primary);
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+    
+    .quiz-option.selected {
+      border-color: var(--primary);
+      background-color: rgba(67, 97, 238, 0.1);
+    }
+    
+    .quiz-option.correct {
+      border-color: var(--success);
+      background-color: rgba(76, 201, 240, 0.1);
+    }
+    
+    .quiz-option.incorrect {
+      border-color: var(--danger);
+      background-color: rgba(230, 57, 70, 0.1);
+    }
+    
+    .course-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+    
+    .enrolled-badge {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: var(--success);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      z-index: 1;
+    }
+    
+    .lecture-list {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    .lecture-item {
+      padding: 15px;
+      border-bottom: 1px solid #e9ecef;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .lecture-item:hover {
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+    
+    .lecture-item.active {
+      background-color: rgba(67, 97, 238, 0.1);
+      border-left: 4px solid var(--primary);
+    }
+    
+    .completed-lecture {
+      color: var(--success);
+    }
+    
+    .dark-mode {
+      background-color: #1a1a2e;
+      color: #e6e6e6;
+    }
+    
+    .dark-mode .card {
+      background-color: #16213e;
+      color: #e6e6e6;
+    }
+    
+    .dark-mode .navbar-custom {
+      background: rgba(26, 26, 46, 0.95) !important;
+    }
+    
+    .dark-mode .navbar-custom.scrolled {
+      background: #16213e !important;
+    }
+    
+    .dark-mode .nav-link-custom {
+      color: #e6e6e6 !important;
+    }
+    
+    .dark-mode .search-box {
+      background-color: #16213e;
+      border-color: #0f3460;
+      color: #e6e6e6;
+    }
+    
+    .dark-mode .stats-card {
+      background-color: #16213e;
+      color: #e6e6e6;
+    }
+    
+    .dark-mode-toggle {
+      background: none;
+      border: none;
+      color: var(--dark);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .dark-mode .dark-mode-toggle {
+      color: #e6e6e6;
+    }
+    
+    .payment-method {
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .payment-method:hover {
+      border-color: var(--primary);
+    }
+    
+    .payment-method.selected {
+      border-color: var(--primary);
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+    
+    .certificate-card {
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .certificate-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-5px);
+    }
+    
+    .certificate-preview {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 10px;
+      padding: 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border: 2px dashed #dee2e6;
+    }
+    
+    .certificate-border {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      border: 2px solid var(--primary);
+      border-radius: 5px;
+      pointer-events: none;
+    }
+    
+    .certificate-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      font-size: 5rem;
+      color: rgba(0,0,0,0.05);
+      font-weight: bold;
+      pointer-events: none;
+    }
+    
+    .receipt-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .receipt-header {
+      text-align: center;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .receipt-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .receipt-total {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 0;
+      border-top: 2px solid var(--primary);
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    
+    .shipping-address {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    
+    .payment-success {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    
+    .payment-success-icon {
+      font-size: 4rem;
+      color: var(--success);
+      margin-bottom: 20px;
+    }
+    
+    .locked-content {
+      position: relative;
+    }
+    
+    .locked-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      border-radius: 10px;
+      z-index: 10;
+    }
+    
+    .locked-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+    
+    .youtube-container {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      height: 0;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+    
+    .youtube-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    
+    .email-receipt-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom fixed-top" id="navbar">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#" onclick="showSection('home')">
+      <i class="fas fa-graduation-cap me-2"></i>LearnHub
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav align-items-center">
+        <li class="nav-item"><a class="nav-link nav-link-custom" href="#" onclick="showSection('home')">Home</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-custom" href="#" onclick="showSection('courses')">Courses</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-custom" href="#" onclick="showSection('quiz')">Quizzes</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-custom" href="#" onclick="showSection('assignment')">Assignments</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-custom" href="#" onclick="showSection('certificates')">Certificates</a></li>
+        <li class="nav-item position-relative">
+          <a class="nav-link nav-link-custom cart-icon" href="#" onclick="showSection('cart')">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge" id="cart-count">0</span>
+          </a>
+        </li>
+        <li class="nav-item"><a class="nav-link nav-link-custom" href="#" onclick="showSection('contact')">Contact</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-custom" href="#" onclick="showSection('admin-login')">Admin</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+            <div class="user-avatar" id="user-avatar">U</div>
+            <span id="username-display">User</span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" onclick="showSection('profile')"><i class="fas fa-user me-2"></i>Profile</a></li>
+            <li><a class="dropdown-item" href="#" onclick="showSection('my-courses')"><i class="fas fa-book me-2"></i>My Courses</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <button class="dark-mode-toggle" id="dark-mode-toggle">
+            <i class="fas fa-moon"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Login -->
+<div id="login" class="container my-5 hidden">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+      <div class="card p-4 mx-auto feature-card">
+        <div class="text-center mb-4">
+          <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
+          <h3>Welcome Back</h3>
+          <p class="text-muted">Sign in to continue your learning journey</p>
+        </div>
+        <form id="login-form">
+          <div class="mb-3">
+            <label for="login-email" class="form-label">Email</label>
+            <input type="email" id="login-email" class="form-control" placeholder="Enter your Gmail address" required>
+            <div class="form-text">Only Gmail accounts are allowed</div>
+          </div>
+          <div class="mb-3">
+            <label for="login-password" class="form-label">Password</label>
+            <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required>
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="remember-me">
+            <label class="form-check-label" for="remember-me">Remember me</label>
+          </div>
+          <button class="btn btn-primary-custom w-100" type="submit">Login</button>
+          <p class="mt-3 text-center">Don't have an account? <a href="#" class="text-info" onclick="showSection('signup')">Sign up</a></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Signup -->
+<div id="signup" class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+      <div class="card p-4 mx-auto feature-card">
+        <div class="text-center mb-4">
+          <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+          <h3>Create Account</h3>
+          <p class="text-muted">Join thousands of learners worldwide</p>
+        </div>
+        <form id="signup-form">
+          <div class="mb-3">
+            <label for="signup-name" class="form-label">Full Name</label>
+            <input type="text" id="signup-name" class="form-control" placeholder="Enter your full name" required>
+          </div>
+          <div class="mb-3">
+            <label for="signup-email" class="form-label">Email</label>
+            <input type="email" id="signup-email" class="form-control" placeholder="Enter your Gmail address" required>
+            <div class="form-text">Only Gmail accounts are allowed</div>
+          </div>
+          <div class="mb-3">
+            <label for="signup-password" class="form-label">Password</label>
+            <input type="password" id="signup-password" class="form-control" placeholder="Create a password" required>
+          </div>
+          <div class="mb-3">
+            <label for="signup-confirm-password" class="form-label">Confirm Password</label>
+            <input type="password" id="signup-confirm-password" class="form-control" placeholder="Confirm your password" required>
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="terms" required>
+            <label class="form-check-label" for="terms">I agree to the <a href="#">Terms and Conditions</a></label>
+          </div>
+          <button class="btn btn-primary-custom w-100" type="submit">Sign Up</button>
+          <p class="mt-3 text-center">Already have an account? <a href="#" class="text-info" onclick="showSection('login')">Login</a></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Home -->
+<div id="home" class="hidden">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="container text-center">
+      <h1 class="display-4 fw-bold mb-4">Learn Without Limits</h1>
+      <p class="lead mb-4">Advance your career with our expert-led courses. Build skills with courses, certificates, and degrees online from world-class universities and companies.</p>
+      <button class="btn btn-primary-custom btn-lg" onclick="showSection('courses')">Explore Courses</button>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="container my-5">
+    <div class="row text-center mb-5">
+      <div class="col">
+        <h2 class="fw-bold">Why Choose LearnHub?</h2>
+        <p class="text-muted">We provide the best learning experience for our students</p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card p-4 text-center feature-card h-100">
+          <div class="text-primary mb-3">
+            <i class="fas fa-laptop-code fa-3x"></i>
+          </div>
+          <h5>Expert Instructors</h5>
+          <p class="text-muted">Learn from industry experts with real-world experience</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-4 text-center feature-card h-100">
+          <div class="text-primary mb-3">
+            <i class="fas fa-clock fa-3x"></i>
+          </div>
+          <h5>Lifetime Access</h5>
+          <p class="text-muted">Get lifetime access to all course materials after enrollment</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-4 text-center feature-card h-100">
+          <div class="text-primary mb-3">
+            <i class="fas fa-certificate fa-3x"></i>
+          </div>
+          <h5>Certification</h5>
+          <p class="text-muted">Earn certificates to showcase your skills to employers</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="container my-5">
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="stats-card">
+          <h2 class="stats-number">10K+</h2>
+          <p class="stats-label">Students Enrolled</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stats-card">
+          <h2 class="stats-number">200+</h2>
+          <p class="stats-label">Courses Available</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stats-card">
+          <h2 class="stats-number">50+</h2>
+          <p class="stats-label">Expert Instructors</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stats-card">
+          <h2 class="stats-number">98%</h2>
+          <p class="stats-label">Satisfaction Rate</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popular Courses Section -->
+  <div class="container my-5">
+    <div class="row mb-4">
+      <div class="col">
+        <h2 class="fw-bold">Popular Courses</h2>
+        <p class="text-muted">Most enrolled courses by our students</p>
+      </div>
+      <div class="col-auto">
+        <a href="#" class="btn btn-outline-primary" onclick="showSection('courses')">View All</a>
+      </div>
+    </div>
+    <div class="row g-4" id="popular-courses">
+      <!-- Popular courses will be dynamically loaded here -->
+    </div>
+  </div>
+</div>
+
+<!-- Courses -->
+<div id="courses" class="container my-5 hidden">
+  <div class="row mb-4">
+    <div class="col">
+      <h2 class="fw-bold">All Courses</h2>
+      <p class="text-muted">Explore our wide range of courses</p>
+    </div>
+    <div class="col-md-4">
+      <div class="input-group">
+        <input type="text" id="search-course" class="form-control search-box" placeholder="Search courses...">
+        <button class="btn btn-primary" onclick="searchCourses()">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="mb-4">
+    <label for="categorySelect" class="form-label fw-bold">Filter by Category:</label>
+    <select id="categorySelect" class="form-select w-50" onchange="filterCourses()">
+      <option value="all">All Categories</option>
+      <option value="programming">Programming</option>
+      <option value="data science">Data Science</option>
+      <option value="design">Design</option>
+      <option value="business">Business</option>
+      <option value="marketing">Marketing</option>
+      <option value="language">Language</option>
+      <option value="music">Music</option>
+      <option value="photography">Photography</option>
+    </select>
+  </div>
+  <div id="course-list" class="row g-4"></div>
+</div>
+
+<!-- Video Lectures -->
+<div id="video-lectures" class="container my-5 hidden">
+  <div class="row">
+    <div class="col-md-8">
+      <h2 class="mb-4" id="lecture-course-title">Video Lectures</h2>
+      <div class="mb-4">
+        <div id="video-container">
+          <!-- Video will be dynamically loaded here -->
+        </div>
+      </div>
+      <div class="card p-3">
+        <h5 id="current-lecture-title">Lecture Title</h5>
+        <p id="current-lecture-description">Lecture description will appear here.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Course Content</h5>
+        </div>
+        <div class="lecture-list" id="lecture-list">
+          <!-- Lectures will be dynamically loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quizzes -->
+<div id="quiz" class="container my-5 hidden">
+  <h2 class="text-center mb-4">Assess Your Knowledge</h2>
+  <div id="quiz-list" class="row g-4">
+    <!-- Quizzes will be dynamically loaded here -->
+  </div>
+</div>
+
+<!-- Quiz Taking Interface -->
+<div id="quiz-taking" class="container my-5 hidden">
+  <div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 id="quiz-title">Quiz Title</h3>
+      <div class="d-flex align-items-center">
+        <span class="me-3">Time Left: <span id="quiz-timer">10:00</span></span>
+        <span>Question <span id="current-question">1</span> of <span id="total-questions">5</span></span>
+      </div>
+    </div>
+    
+    <div class="progress-container mb-4">
+      <div class="progress-bar" id="quiz-progress" style="width: 0%"></div>
+    </div>
+    
+    <div id="quiz-question-container">
+      <!-- Quiz questions will be dynamically loaded here -->
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+      <button class="btn btn-outline-primary" id="prev-question" onclick="previousQuestion()" disabled>
+        <i class="fas fa-arrow-left me-2"></i>Previous
+      </button>
+      <button class="btn btn-primary" id="next-question" onclick="nextQuestion()">
+        Next<i class="fas fa-arrow-right ms-2"></i>
+      </button>
+      <button class="btn btn-success hidden" id="submit-quiz" onclick="submitQuiz()">
+        Submit Quiz
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Quiz Results -->
+<div id="quiz-results" class="container my-5 hidden">
+  <div class="card p-4 text-center">
+    <div class="mb-4">
+      <i class="fas fa-trophy fa-4x text-warning mb-3"></i>
+      <h3>Quiz Completed!</h3>
+      <p class="text-muted">You have completed the quiz</p>
+    </div>
+    
+    <div class="row justify-content-center mb-4">
+      <div class="col-md-6">
+        <div class="card p-3 bg-light">
+          <h4>Your Score</h4>
+          <h2 class="text-primary" id="quiz-score">0/0</h2>
+          <div class="progress-container mx-auto" style="width: 80%;">
+            <div class="progress-bar" id="score-progress" style="width: 0%"></div>
+          </div>
+          <p id="score-percentage" class="mt-2">0%</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-primary me-2" onclick="showSection('quiz')">
+        <i class="fas fa-arrow-left me-2"></i>Back to Quizzes
+      </button>
+      <button class="btn btn-outline-primary" onclick="reviewQuiz()">
+        <i class="fas fa-redo me-2"></i>Review Answers
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Assignments -->
+<div id="assignment" class="container my-5 hidden">
+  <h2 class="text-center mb-4">Your Assignments</h2>
+  <div id="assignment-list" class="row g-4">
+    <!-- Assignments will be dynamically loaded here -->
+  </div>
+</div>
+
+<!-- Certificates -->
+<div id="certificates" class="container my-5 hidden">
+  <h2 class="text-center mb-4">Your Certificates</h2>
+  <p class="text-center text-muted mb-5">Download your earned certificates to showcase your achievements</p>
+  
+  <div id="certificates-list" class="row g-4">
+    <!-- Certificates will be dynamically loaded here -->
+  </div>
+  
+  <div class="text-center mt-5">
+    <button class="btn btn-primary-custom" onclick="generateAllCertificates()">
+      <i class="fas fa-download me-2"></i>Download All Certificates
+    </button>
+  </div>
+</div>
+
+<!-- Certificate Preview -->
+<div id="certificate-preview" class="container my-5 hidden">
+  <div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3>Certificate Preview</h3>
+      <button class="btn btn-primary" onclick="downloadCertificate()">
+        <i class="fas fa-download me-2"></i>Download Certificate
+      </button>
+    </div>
+    
+    <div id="certificate-template" class="certificate-preview">
+      <div class="certificate-border"></div>
+      <div class="certificate-watermark">LEARNHUB</div>
+      
+      <div class="mb-4">
+        <h1 class="text-primary">Certificate of Completion</h1>
+        <p class="text-muted">This is to certify that</p>
+      </div>
+      
+      <div class="mb-4">
+        <h2 id="certificate-student-name" class="display-4 fw-bold">Student Name</h2>
+        <p class="text-muted">has successfully completed the course</p>
+        <h3 id="certificate-course-name" class="text-primary">Course Name</h3>
+      </div>
+      
+      <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+          <p class="text-muted">with a final grade of <span id="certificate-grade" class="fw-bold">A+</span> and demonstrated outstanding commitment to learning.</p>
+        </div>
+      </div>
+      
+      <div class="row mt-5">
+        <div class="col-md-6 text-start">
+          <div class="border-top pt-3">
+            <p class="mb-0 fw-bold" id="certificate-instructor">Nishmith Reddy</p>
+            <p class="text-muted">Lead Instructor</p>
+          </div>
+        </div>
+        <div class="col-md-6 text-end">
+          <div class="border-top pt-3">
+            <p class="mb-0 fw-bold" id="certificate-date">Date</p>
+            <p class="text-muted">Date of Completion</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-4">
+        <p class="text-muted small">Certificate ID: <span id="certificate-id" class="fw-bold">LH-2025-001</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- My Learning / Cart -->
+<div id="cart" class="container my-5 hidden">
+  <h2 class="text-center mb-4">My Learning</h2>
+  
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card p-3 mb-4">
+        <h5 class="mb-3">Enrolled Courses</h5>
+        <div id="enrolled-courses-list">
+          <!-- Enrolled courses will be dynamically loaded here -->
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="card p-3">
+        <h5 class="mb-3">Learning Statistics</h5>
+        <div class="mb-3">
+          <p class="mb-1">Courses Enrolled</p>
+          <h4 class="text-primary" id="enrolled-count">0</h4>
+        </div>
+        <div class="mb-3">
+          <p class="mb-1">Courses Completed</p>
+          <h4 class="text-success" id="completed-count">0</h4>
+        </div>
+        <div class="mb-3">
+          <p class="mb-1">Total Learning Hours</p>
+          <h4 class="text-info" id="learning-hours">0</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card p-3 mt-4">
+    <h5 class="mb-3">Cart</h5>
+    <ul id="cart-items" class="list-group mb-3"></ul>
+    <div class="d-flex justify-content-between align-items-center">
+      <p class="mb-0"><strong>Total: ₹<span id="total-amount">0</span></strong></p>
+      <button class="btn btn-primary" onclick="showSection('payment')">Proceed to Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Section -->
+<div id="payment" class="container my-5 hidden">
+  <h2 class="text-center mb-4">Complete Your Purchase</h2>
+  
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card p-4 mb-4">
+        <h5 class="mb-4">Select Payment Method</h5>
+        
+        <div class="payment-method" onclick="selectPaymentMethod('card')" id="card-payment">
+          <div class="d-flex align-items-center">
+            <div class="form-check me-3">
+              <input class="form-check-input" type="radio" name="paymentMethod" id="cardRadio">
+            </div>
+            <div class="flex-grow-1">
+              <h6 class="mb-1">Credit/Debit Card</h6>
+              <p class="text-muted mb-0">Pay securely with your card</p>
+            </div>
+            <div class="ms-3">
+              <i class="fab fa-cc-visa fa-2x text-primary me-2"></i>
+              <i class="fab fa-cc-mastercard fa-2x text-danger"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="payment-method" onclick="selectPaymentMethod('upi')" id="upi-payment">
+          <div class="d-flex align-items-center">
+            <div class="form-check me-3">
+              <input class="form-check-input" type="radio" name="paymentMethod" id="upiRadio">
+            </div>
+            <div class="flex-grow-1">
+              <h6 class="mb-1">UPI Payment</h6>
+              <p class="text-muted mb-0">Pay using UPI apps</p>
+            </div>
+            <div class="ms-3">
+              <i class="fas fa-mobile-alt fa-2x text-info"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="payment-method" onclick="selectPaymentMethod('cod')" id="cod-payment">
+          <div class="d-flex align-items-center">
+            <div class="form-check me-3">
+              <input class="form-check-input" type="radio" name="paymentMethod" id="codRadio">
+            </div>
+            <div class="flex-grow-1">
+              <h6 class="mb-1">Cash on Delivery</h6>
+              <p class="text-muted mb-0">Pay when you receive the course materials</p>
+            </div>
+            <div class="ms-3">
+              <i class="fas fa-money-bill-wave fa-2x text-success"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Card Payment Form -->
+        <div id="card-payment-form" class="mt-4 hidden">
+          <h6 class="mb-3">Card Details</h6>
+          <div class="row g-3">
+            <div class="col-md-12">
+              <label for="card-number" class="form-label">Card Number</label>
+              <input type="text" id="card-number" class="form-control" placeholder="1234 5678 9012 3456">
+            </div>
+            <div class="col-md-6">
+              <label for="card-expiry" class="form-label">Expiry Date</label>
+              <input type="text" id="card-expiry" class="form-control" placeholder="MM/YY">
+            </div>
+            <div class="col-md-6">
+              <label for="card-cvv" class="form-label">CVV</label>
+              <input type="text" id="card-cvv" class="form-control" placeholder="123">
+            </div>
+            <div class="col-md-12">
+              <label for="card-name" class="form-label">Name on Card</label>
+              <input type="text" id="card-name" class="form-control" placeholder="John Doe">
+            </div>
+          </div>
+        </div>
+        
+        <!-- UPI Payment Form -->
+        <div id="upi-payment-form" class="mt-4 hidden">
+          <h6 class="mb-3">UPI Details</h6>
+          <div class="mb-3">
+            <label for="upi-id" class="form-label">UPI ID</label>
+            <input type="text" id="upi-id" class="form-control" placeholder="yourname@upi">
+          </div>
+          <div class="text-center">
+            <button class="btn btn-outline-primary" onclick="generateQRCode()">
+              <i class="fas fa-qrcode me-2"></i>Generate QR Code
+            </button>
+          </div>
+          <div id="qr-code" class="text-center my-3"></div>
+        </div>
+        
+        <!-- COD Information -->
+        <div id="cod-info" class="mt-4 hidden">
+          <div class="alert alert-info">
+            <h6><i class="fas fa-info-circle me-2"></i>Cash on Delivery</h6>
+            <p class="mb-0">You will pay when you receive access to the course materials. A delivery executive will contact you within 24 hours.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card p-4">
+        <h5 class="mb-3">Shipping Address</h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="shipping-name" class="form-label">Full Name</label>
+            <input type="text" id="shipping-name" class="form-control" placeholder="Enter your full name">
+          </div>
+          <div class="col-md-6">
+            <label for="shipping-phone" class="form-label">Phone Number</label>
+            <input type="tel" id="shipping-phone" class="form-control" placeholder="Enter your phone number">
+          </div>
+          <div class="col-md-12">
+            <label for="shipping-address" class="form-label">Address</label>
+            <textarea id="shipping-address" class="form-control" placeholder="Enter your complete address" rows="3"></textarea>
+          </div>
+          <div class="col-md-6">
+            <label for="shipping-city" class="form-label">City</label>
+            <input type="text" id="shipping-city" class="form-control" placeholder="Enter your city">
+          </div>
+          <div class="col-md-6">
+            <label for="shipping-pincode" class="form-label">PIN Code</label>
+            <input type="text" id="shipping-pincode" class="form-control" placeholder="Enter PIN code">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="card p-4">
+        <h5 class="mb-3">Order Summary</h5>
+        <div id="payment-cart-items">
+          <!-- Cart items for payment will be dynamically loaded here -->
+        </div>
+        <div class="receipt-total">
+          <span>Total:</span>
+          <span>₹<span id="payment-total-amount">0</span></span>
+        </div>
+        
+        <div class="mt-4">
+          <button class="btn btn-primary-custom w-100" onclick="processPayment()">
+            Complete Purchase
+          </button>
+          <button class="btn btn-outline-secondary w-100 mt-2" onclick="showSection('cart')">
+            Back to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Success -->
+<div id="payment-success" class="container my-5 hidden">
+  <div class="payment-success">
+    <div class="payment-success-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h2 class="mb-3">Payment Successful!</h2>
+    <p class="text-muted mb-4">Thank you for your purchase. You can now access your courses.</p>
+    
+    <div class="receipt-container mb-5">
+      <div class="receipt-header">
+        <h3>LearnHub</h3>
+        <p class="text-muted">E-Learning Platform</p>
+        <p>Order Confirmation</p>
+      </div>
+      
+      <div class="mb-4">
+        <p><strong>Order ID:</strong> <span id="receipt-order-id">LH-2025-001</span></p>
+        <p><strong>Date:</strong> <span id="receipt-date">01/04/2025</span></p>
+        <p><strong>Payment Method:</strong> <span id="receipt-payment-method">Credit Card</span></p>
+      </div>
+      
+      <div id="receipt-items">
+        <!-- Receipt items will be dynamically loaded here -->
+      </div>
+      
+      <div class="receipt-total">
+        <span>Total:</span>
+        <span>₹<span id="receipt-total">0</span></span>
+      </div>
+      
+      <div class="shipping-address">
+        <h6>Shipping Address</h6>
+        <p id="receipt-shipping-address">No address provided</p>
+      </div>
+    </div>
+    
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-primary me-3" onclick="showSection('courses')">
+        <i class="fas fa-play-circle me-2"></i>Start Learning
+      </button>
+      <button class="btn btn-outline-primary" onclick="downloadReceiptAsPDF()">
+        <i class="fas fa-file-pdf me-2"></i>Download PDF Receipt
+      </button>
+      <button class="btn btn-info ms-2" onclick="downloadEmailAsPDF()">
+        <i class="fas fa-envelope me-2"></i>Download Email PDF
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile -->
+<div id="profile" class="container my-5 hidden">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card p-4 text-center">
+        <div class="mb-3">
+          <div class="user-avatar mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;" id="profile-avatar">U</div>
+          <h4 id="profile-name">User Name</h4>
+          <p class="text-muted" id="profile-email">user@example.com</p>
+        </div>
+        <button class="btn btn-outline-primary w-100 mb-2" onclick="editProfile()">
+          <i class="fas fa-edit me-2"></i>Edit Profile
+        </button>
+        <button class="btn btn-outline-secondary w-100">
+          <i class="fas fa-cog me-2"></i>Settings
+        </button>
+      </div>
+      
+      <div class="card p-3 mt-4">
+        <h5 class="mb-3">Achievements</h5>
+        <div class="d-flex align-items-center mb-3">
+          <div class="bg-warning text-white rounded-circle p-2 me-3">
+            <i class="fas fa-medal"></i>
+          </div>
+          <div>
+            <h6 class="mb-0">First Course Completed</h6>
+            <small class="text-muted">Complete your first course</small>
+          </div>
+        </div>
+        <div class="d-flex align-items-center mb-3">
+          <div class="bg-secondary text-white rounded-circle p-2 me-3">
+            <i class="fas fa-star"></i>
+          </div>
+          <div>
+            <h6 class="mb-0">Quiz Master</h6>
+            <small class="text-muted">Score 100% on any quiz</small>
+          </div>
+        </div>
+        <div class="d-flex align-items-center">
+          <div class="bg-secondary text-white rounded-circle p-2 me-3">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <div>
+            <h6 class="mb-0">Course Collector</h6>
+            <small class="text-muted">Enroll in 5 courses</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-8">
+      <div class="card p-4">
+        <h5 class="mb-4">Learning Progress</h5>
+        <div id="profile-progress">
+          <!-- Progress will be dynamically loaded here -->
+        </div>
+      </div>
+      
+      <div class="card p-4 mt-4">
+        <h5 class="mb-4">Recent Activity</h5>
+        <div id="recent-activity">
+          <!-- Recent activity will be dynamically loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Contact -->
+<div id="contact" class="container my-5 hidden">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <h2 class="text-center mb-4">Get In Touch</h2>
+      <p class="text-center text-muted mb-5">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+      
+      <div class="row mb-5">
+        <div class="col-md-4 text-center">
+          <div class="bg-primary text-white rounded-circle p-3 mx-auto mb-3" style="width: 70px; height: 70px;">
+            <i class="fas fa-phone fa-2x"></i>
+          </div>
+          <h5>Phone</h5>
+          <p class="text-muted">+1 (555) 123-4567</p>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="bg-success text-white rounded-circle p-3 mx-auto mb-3" style="width: 70px; height: 70px;">
+            <i class="fas fa-envelope fa-2x"></i>
+          </div>
+          <h5>Email</h5>
+          <p class="text-muted">support@learnhub.com</p>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="bg-warning text-white rounded-circle p-3 mx-auto mb-3" style="width: 70px; height: 70px;">
+            <i class="fas fa-map-marker-alt fa-2x"></i>
+          </div>
+          <h5>Address</h5>
+          <p class="text-muted">123 Education St, Learn City</p>
+        </div>
+      </div>
+      
+      <form id="contact-form" class="mx-auto">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="name" class="form-label">Your Name</label>
+            <input type="text" id="name" class="form-control" placeholder="Enter your name" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="email" class="form-label">Your Email</label>
+            <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="phone" class="form-label">Your Phone</label>
+            <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number" pattern="[0-9]{10}" required>
+        </div>
+        <div class="mb-3">
+          <label for="subject" class="form-label">Subject</label>
+          <input type="text" id="subject" class="form-control" placeholder="Enter subject" required>
+        </div>
+        <div class="mb-3">
+          <label for="message" class="form-label">Message</label>
+          <textarea id="message" class="form-control" placeholder="Enter your message" rows="5" required></textarea>
+        </div>
+        <button class="btn btn-primary-custom w-100" type="submit">Send Message</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Login -->
+<div id="admin-login" class="container my-5 hidden">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+      <div class="card p-4 mx-auto feature-card">
+        <div class="text-center mb-4">
+          <i class="fas fa-user-shield fa-3x text-primary mb-3"></i>
+          <h3>Admin Login</h3>
+          <p class="text-muted">Access the admin dashboard</p>
+        </div>
+        <form id="admin-login-form">
+          <div class="mb-3">
+            <label for="admin-username" class="form-label">Username</label>
+            <input type="text" id="admin-username" class="form-control" placeholder="Enter admin username" required>
+          </div>
+          <div class="mb-3">
+            <label for="admin-password" class="form-label">Password</label>
+            <input type="password" id="admin-password" class="form-control" placeholder="Enter admin password" required>
+          </div>
+          <button class="btn btn-primary-custom w-100" type="submit">Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Panel -->
+<div id="admin-panel" class="container my-5 hidden">
+  <h2 class="text-center mb-4">Admin Panel - Manage Platform</h2>
+  
+  <ul class="nav nav-tabs mb-4" id="adminTabs">
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#courses-tab">Courses</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#users-tab">Users</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#analytics-tab">Analytics</a>
+    </li>
+  </ul>
+  
+  <div class="tab-content">
+    <!-- Courses Tab -->
+    <div class="tab-pane fade show active" id="courses-tab">
+      <div class="card p-4">
+        <h4 class="mb-4">Add New Course</h4>
+        <form id="add-course-form">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <input type="text" id="course-name" class="form-control" placeholder="Course Name" required>
+            </div>
+            <div class="col-md-2">
+              <input type="number" id="course-price" class="form-control" placeholder="Price" required>
+            </div>
+            <div class="col-md-3">
+              <select id="course-category" class="form-select" required>
+                <option value="programming">Programming</option>
+                <option value="data science">Data Science</option>
+                <option value="design">Design</option>
+                <option value="business">Business</option>
+                <option value="marketing">Marketing</option>
+                <option value="language">Language</option>
+                <option value="music">Music</option>
+                <option value="photography">Photography</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <input type="url" id="course-image" class="form-control" placeholder="Image URL" required>
+            </div>
+            <div class="col-md-6">
+              <input type="url" id="course-video" class="form-control" placeholder="Intro Video URL" required>
+            </div>
+            <div class="col-md-6">
+              <textarea id="course-description" class="form-control" placeholder="Course Description" required></textarea>
+            </div>
+            <div class="col-md-12">
+              <button class="btn btn-success w-100" type="submit">Add Course</button>
+            </div>
+          </div>
+        </form>
+        
+        <h4 class="mt-5 mb-3">Existing Courses</h4>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Category</th>
+                <th>Enrollments</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-course-list">
+              <!-- Courses will be dynamically loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Users Tab -->
+    <div class="tab-pane fade" id="users-tab">
+      <div class="card p-4">
+        <h4 class="mb-4">User Management</h4>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Joined</th>
+                <th>Courses</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-user-list">
+              <!-- Users will be dynamically loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Analytics Tab -->
+    <div class="tab-pane fade" id="analytics-tab">
+      <div class="card p-4">
+        <h4 class="mb-4">Platform Analytics</h4>
+        <div class="row g-4">
+          <div class="col-md-3">
+            <div class="stats-card">
+              <h2 class="stats-number" id="total-users">0</h2>
+              <p class="stats-label">Total Users</p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stats-card">
+              <h2 class="stats-number" id="total-courses">0</h2>
+              <p class="stats-label">Total Courses</p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stats-card">
+              <h2 class="stats-number" id="total-enrollments">0</h2>
+              <p class="stats-label">Total Enrollments</p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stats-card">
+              <h2 class="stats-number" id="total-revenue">0</h2>
+              <p class="stats-label">Total Revenue (₹)</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <div class="card p-3">
+              <h5>Course Popularity</h5>
+              <canvas id="courseChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card p-3">
+              <h5>User Growth</h5>
+              <canvas id="userChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="mt-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <h5><i class="fas fa-graduation-cap me-2"></i>LearnHub</h5>
+        <p>Advance your career with our expert-led courses. Learn anytime, anywhere.</p>
+        <div class="d-flex">
+          <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+      <div class="col-md-2 mb-4">
+        <h5>Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="text-white" onclick="showSection('home')">Home</a></li>
+          <li><a href="#" class="text-white" onclick="showSection('courses')">Courses</a></li>
+          <li><a href="#" class="text-white" onclick="showSection('quiz')">Quizzes</a></li>
+          <li><a href="#" class="text-white" onclick="showSection('contact')">Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3 mb-4">
+        <h5>Categories</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="text-white">Programming</a></li>
+          <li><a href="#" class="text-white">Data Science</a></li>
+          <li><a href="#" class="text-white">Design</a></li>
+          <li><a href="#" class="text-white">Business</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3 mb-4">
+        <h5>Subscribe</h5>
+        <p>Get the latest updates and offers</p>
+        <div class="input-group">
+          <input type="email" class="form-control" placeholder="Your email">
+          <button class="btn btn-primary">Subscribe</button>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <p class="text-center mb-0">&copy; 2025 LearnHub. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Enhanced data structures
+  let currentUser = null;
+  let signedUpUser = null;
+  let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+  let enrolledCourses = JSON.parse(localStorage.getItem('enrolledCourses')) || [];
+  let totalAmount = parseInt(localStorage.getItem('totalAmount')) || 0;
+  let courseProgress = JSON.parse(localStorage.getItem('courseProgress')) || {};
+  let quizResults = JSON.parse(localStorage.getItem('quizResults')) || {};
+  let certificates = JSON.parse(localStorage.getItem('certificates')) || [];
+  let darkMode = localStorage.getItem('darkMode') === 'true';
+  let selectedPaymentMethod = null;
+  let shippingAddress = JSON.parse(localStorage.getItem('shippingAddress')) || {};
+
+  // Enhanced courses with more details and YouTube videos
+  let courses = JSON.parse(localStorage.getItem('courses')) || [
+    { 
+      id: 1,
+      name: "Web Development Bootcamp", 
+      price: 3000, 
+      image: "https://images.unsplash.com/photo-1627398242454-45a1465c2479?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "programming", 
+      video: "https://www.youtube.com/embed/5YDVJaItmaY",
+      description: "Learn to build modern websites and web applications using HTML, CSS, JavaScript and more.",
+      instructor: "John Smith",
+      duration: "40 hours",
+      level: "Beginner",
+      rating: 4.8,
+      students: 1250,
+      lectures: [
+        { title: "Introduction to Web Development", duration: "15:30", video: "https://www.youtube.com/embed/5YDVJaItmaY" },
+        { title: "HTML Basics", duration: "25:15", video: "https://www.youtube.com/embed/qz0aGYrrlhU" },
+        { title: "CSS Fundamentals", duration: "35:20", video: "https://www.youtube.com/embed/1PnVor36_40" },
+        { title: "JavaScript Essentials", duration: "42:10", video: "https://www.youtube.com/embed/W6NZfCO5SIk" },
+        { title: "Responsive Design", duration: "28:45", video: "https://www.youtube.com/embed/srvUrASNj0s" }
+      ]
+    },
+    { 
+      id: 2,
+      name: "Python for Beginners", 
+      price: 2000, 
+      image: "https://images.unsplash.com/photo-1526379879527-8559ecfcaec0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "programming", 
+      video: "https://www.youtube.com/embed/_uQrJ0TkZlc",
+      description: "Start your programming journey with Python. Learn the fundamentals and build your first applications.",
+      instructor: "Sarah Johnson",
+      duration: "30 hours",
+      level: "Beginner",
+      rating: 4.7,
+      students: 980,
+      lectures: [
+        { title: "Introduction to Python", duration: "20:10", video: "https://www.youtube.com/embed/_uQrJ0TkZlc" },
+        { title: "Variables and Data Types", duration: "25:45", video: "https://www.youtube.com/embed/khKv-8q7YmY" },
+        { title: "Control Structures", duration: "30:20", video: "https://www.youtube.com/embed/W8KRzm-HUcc" },
+        { title: "Functions and Modules", duration: "35:15", video: "https://www.youtube.com/embed/9Os0o3wzS_I" },
+        { title: "File Handling", duration: "28:30", video: "https://www.youtube.com/embed/4mX0uPQFLDU" }
+      ]
+    },
+    { 
+      id: 3,
+      name: "Data Science with R", 
+      price: 4000, 
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "data science", 
+      video: "https://www.youtube.com/embed/9kYUGMg_14s",
+      description: "Master data analysis, visualization, and statistical modeling with R programming language.",
+      instructor: "Michael Brown",
+      duration: "50 hours",
+      level: "Intermediate",
+      rating: 4.6,
+      students: 750,
+      lectures: [
+        { title: "Introduction to R", duration: "18:30", video: "https://www.youtube.com/embed/9kYUGMg_14s" },
+        { title: "Data Manipulation", duration: "32:15", video: "https://www.youtube.com/embed/eD0N2Tj0pS4" },
+        { title: "Data Visualization", duration: "28:40", video: "https://www.youtube.com/embed/hSPmj7mK6po" },
+        { title: "Statistical Analysis", duration: "35:25", video: "https://www.youtube.com/embed/L7v9U7Uo9lI" },
+        { title: "Machine Learning with R", duration: "40:10", video: "https://www.youtube.com/embed/7J4iL1HDshQ" }
+      ]
+    },
+    { 
+      id: 4,
+      name: "Machine Learning", 
+      price: 5000, 
+      image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "data science", 
+      video: "https://www.youtube.com/embed/KNAWp2S3w94",
+      description: "Learn the fundamentals of machine learning algorithms and build predictive models.",
+      instructor: "Emily Davis",
+      duration: "60 hours",
+      level: "Advanced",
+      rating: 4.9,
+      students: 620,
+      lectures: [
+        { title: "Introduction to ML", duration: "22:10", video: "https://www.youtube.com/embed/KNAWp2S3w94" },
+        { title: "Supervised Learning", duration: "35:25", video: "https://www.youtube.com/embed/4qVRBYAdLAo" },
+        { title: "Unsupervised Learning", duration: "30:15", video: "https://www.youtube.com/embed/8p6XaQSIFpY" },
+        { title: "Neural Networks", duration: "42:30", video: "https://www.youtube.com/embed/aircAruvnKk" },
+        { title: "Deep Learning", duration: "38:45", video: "https://www.youtube.com/embed/VyWAvY2CF9c" }
+      ]
+    },
+    { 
+      id: 5,
+      name: "UI/UX Design", 
+      price: 3500, 
+      image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "design", 
+      video: "https://www.youtube.com/embed/c9Wg6Cb_YlU",
+      description: "Master user interface and user experience design principles to create engaging digital products.",
+      instructor: "Alex Wilson",
+      duration: "45 hours",
+      level: "Intermediate",
+      rating: 4.7,
+      students: 890,
+      lectures: [
+        { title: "UI/UX Fundamentals", duration: "20:30", video: "https://www.youtube.com/embed/c9Wg6Cb_YlU" },
+        { title: "Wireframing and Prototyping", duration: "28:45", video: "https://www.youtube.com/embed/qpH7-KFWZRI" },
+        { title: "User Research", duration: "25:20", video: "https://www.youtube.com/embed/M3vqFQ7qulg" },
+        { title: "Design Systems", duration: "32:15", video: "https://www.youtube.com/embed/lCYuS2_E0_Y" },
+        { title: "Usability Testing", duration: "29:40", video: "https://www.youtube.com/embed/6q6mS2Q7u-s" }
+      ]
+    },
+    { 
+      id: 6,
+      name: "Graphic Design", 
+      price: 2500, 
+      image: "https://images.unsplash.com/photo-1626785774573-4b799315345d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "design", 
+      video: "https://www.youtube.com/embed/YqQx75OPRa0",
+      description: "Learn the principles of graphic design and create stunning visual content.",
+      instructor: "Lisa Anderson",
+      duration: "35 hours",
+      level: "Beginner",
+      rating: 4.5,
+      students: 1100,
+      lectures: [
+        { title: "Design Principles", duration: "18:20", video: "https://www.youtube.com/embed/YqQx75OPRa0" },
+        { title: "Color Theory", duration: "22:15", video: "https://www.youtube.com/embed/_2LLXnUdUIc" },
+        { title: "Typography", duration: "25:30", video: "https://www.youtube.com/embed/sByzHoiYFX0" },
+        { title: "Logo Design", duration: "28:45", video: "https://www.youtube.com/embed/9QxNtvGk2cI" },
+        { title: "Brand Identity", duration: "31:20", video: "https://www.youtube.com/embed/lpA4uJsvGaI" }
+      ]
+    },
+    { 
+      id: 7,
+      name: "Digital Marketing", 
+      price: 2800, 
+      image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "marketing", 
+      video: "https://www.youtube.com/embed/bixR-KIJKYM",
+      description: "Learn digital marketing strategies including SEO, social media, email marketing, and more.",
+      instructor: "David Miller",
+      duration: "38 hours",
+      level: "Beginner",
+      rating: 4.6,
+      students: 950,
+      lectures: [
+        { title: "Digital Marketing Overview", duration: "19:30", video: "https://www.youtube.com/embed/bixR-KIJKYM" },
+        { title: "SEO Fundamentals", duration: "26:45", video: "https://www.youtube.com/embed/xsVTqzratPs" },
+        { title: "Social Media Marketing", duration: "24:20", video: "https://www.youtube.com/embed/9CPmtXe7Fnw" },
+        { title: "Email Marketing", duration: "21:15", video: "https://www.youtube.com/embed/KVy4bJHea_c" },
+        { title: "Content Marketing", duration: "28:30", video: "https://www.youtube.com/embed/9CPmtXe7Fnw" }
+      ]
+    },
+    { 
+      id: 8,
+      name: "Business Management", 
+      price: 3200, 
+      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "business", 
+      video: "https://www.youtube.com/embed/Nl7iK8Cq7cU",
+      description: "Learn essential business management skills including leadership, strategy, and operations.",
+      instructor: "Robert Taylor",
+      duration: "42 hours",
+      level: "Intermediate",
+      rating: 4.7,
+      students: 780,
+      lectures: [
+        { title: "Business Fundamentals", duration: "22:10", video: "https://www.youtube.com/embed/Nl7iK8Cq7cU" },
+        { title: "Strategic Planning", duration: "28:45", video: "https://www.youtube.com/embed/snO9erg6k9E" },
+        { title: "Leadership Skills", duration: "25:20", video: "https://www.youtube.com/embed/eeG6Z5_5ZQY" },
+        { title: "Financial Management", duration: "31:15", video: "https://www.youtube.com/embed/5ycx9hFGHog" },
+        { title: "Operations Management", duration: "29:30", video: "https://www.youtube.com/embed/8aD7rnk6cE0" }
+      ]
+    },
+    { 
+      id: 9,
+      name: "Mobile App Development", 
+      price: 4500, 
+      image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "programming", 
+      video: "https://www.youtube.com/embed/fis26HvvDII",
+      description: "Build mobile applications for iOS and Android using React Native and Flutter.",
+      instructor: "Jennifer Lee",
+      duration: "55 hours",
+      level: "Intermediate",
+      rating: 4.8,
+      students: 680,
+      lectures: [
+        { title: "Mobile Development Overview", duration: "21:30", video: "https://www.youtube.com/embed/fis26HvvDII" },
+        { title: "React Native Basics", duration: "32:45", video: "https://www.youtube.com/embed/0-S5a0eXPoc" },
+        { title: "Flutter Fundamentals", duration: "29:20", video: "https://www.youtube.com/embed/1gDhl4leEzA" },
+        { title: "API Integration", duration: "35:15", video: "https://www.youtube.com/embed/7CqJlxBYj-M" },
+        { title: "App Deployment", duration: "26:30", video: "https://www.youtube.com/embed/tNulrEbTQf8" }
+      ]
+    },
+    { 
+      id: 10,
+      name: "Photography Masterclass", 
+      price: 2200, 
+      image: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "photography", 
+      video: "https://www.youtube.com/embed/V7z7BAZdt2M",
+      description: "Learn professional photography techniques from composition to post-processing.",
+      instructor: "Chris Johnson",
+      duration: "32 hours",
+      level: "Beginner",
+      rating: 4.6,
+      students: 1200,
+      lectures: [
+        { title: "Photography Basics", duration: "23:30", video: "https://www.youtube.com/embed/V7z7BAZdt2M" },
+        { title: "Composition Techniques", duration: "28:45", video: "https://www.youtube.com/embed/7ZVyNjKSr0M" },
+        { title: "Lighting Essentials", duration: "26:20", video: "https://www.youtube.com/embed/Qk2Ba7pOj_g" },
+        { title: "Portrait Photography", duration: "31:15", video: "https://www.youtube.com/embed/9R7gUE3b_fY" },
+        { title: "Photo Editing", duration: "29:30", video: "https://www.youtube.com/embed/QXItd-sp3tY" }
+      ]
+    },
+    { 
+      id: 11,
+      name: "Spanish Language Course", 
+      price: 1800, 
+      image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "language", 
+      video: "https://www.youtube.com/embed/qE-03EATjho",
+      description: "Learn Spanish from scratch with comprehensive lessons on grammar, vocabulary, and conversation.",
+      instructor: "Maria Garcia",
+      duration: "40 hours",
+      level: "Beginner",
+      rating: 4.7,
+      students: 850,
+      lectures: [
+        { title: "Spanish Alphabet & Pronunciation", duration: "25:30", video: "https://www.youtube.com/embed/qE-03EATjho" },
+        { title: "Basic Grammar", duration: "32:45", video: "https://www.youtube.com/embed/2ETvEdK-p8o" },
+        { title: "Common Phrases", duration: "28:20", video: "https://www.youtube.com/embed/AKfg1XG0lC0" },
+        { title: "Conversation Practice", duration: "35:15", video: "https://www.youtube.com/embed/4R2We7II6eY" },
+        { title: "Cultural Insights", duration: "29:30", video: "https://www.youtube.com/embed/5Nd6Q1K3d2c" }
+      ]
+    },
+    { 
+      id: 12,
+      name: "Guitar for Beginners", 
+      price: 1500, 
+      image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "music", 
+      video: "https://www.youtube.com/embed/BBz-Jyr23M4",
+      description: "Learn to play guitar from scratch with step-by-step lessons and practice exercises.",
+      instructor: "Mike Thompson",
+      duration: "25 hours",
+      level: "Beginner",
+      rating: 4.8,
+      students: 1100,
+      lectures: [
+        { title: "Guitar Basics", duration: "22:30", video: "https://www.youtube.com/embed/BBz-Jyr23M4" },
+        { title: "Basic Chords", duration: "28:45", video: "https://www.youtube.com/embed/5Z2Cm6_1t6I" },
+        { title: "Strumming Patterns", duration: "26:20", video: "https://www.youtube.com/embed/QV1a7p1kD1c" },
+        { title: "Your First Song", duration: "31:15", video: "https://www.youtube.com/embed/r0q6a4W2t2I" },
+        { title: "Music Theory Basics", duration: "29:30", video: "https://www.youtube.com/embed/rgaTLrZGlk0" }
+      ]
+    },
+    { 
+      id: 13,
+      name: "Financial Planning", 
+      price: 2900, 
+      image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "business", 
+      video: "https://www.youtube.com/embed/G0Cp7LvG5FE",
+      description: "Learn to manage your finances, invest wisely, and plan for your financial future.",
+      instructor: "Rachel Green",
+      duration: "35 hours",
+      level: "Beginner",
+      rating: 4.7,
+      students: 720,
+      lectures: [
+        { title: "Financial Planning Basics", duration: "24:30", video: "https://www.youtube.com/embed/G0Cp7LvG5FE" },
+        { title: "Budgeting & Saving", duration: "30:45", video: "https://www.youtube.com/embed/YQkf3X3X5e0" },
+        { title: "Investment Strategies", duration: "28:20", video: "https://www.youtube.com/embed/F3zw1Gvn4xQ" },
+        { title: "Retirement Planning", duration: "33:15", video: "https://www.youtube.com/embed/8-6qSu5Q-7c" },
+        { title: "Tax Planning", duration: "29:30", video: "https://www.youtube.com/embed/5Z2Cm6_1t6I" }
+      ]
+    },
+    { 
+      id: 14,
+      name: "Public Speaking", 
+      price: 1900, 
+      image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "business", 
+      video: "https://www.youtube.com/embed/tShavGuo0_E",
+      description: "Overcome stage fright and become a confident, effective public speaker.",
+      instructor: "James Wilson",
+      duration: "28 hours",
+      level: "Beginner",
+      rating: 4.8,
+      students: 950,
+      lectures: [
+        { title: "Overcoming Fear", duration: "23:30", video: "https://www.youtube.com/embed/tShavGuo0_E" },
+        { title: "Speech Structure", duration: "29:45", video: "https://www.youtube.com/embed/OyU5O9O_DfM" },
+        { title: "Body Language", duration: "27:20", video: "https://www.youtube.com/embed/cFLjudWTuGQ" },
+        { title: "Voice Modulation", duration: "32:15", video: "https://www.youtube.com/embed/4OKFz_6cygo" },
+        { title: "Handling Q&A", duration: "28:30", video: "https://www.youtube.com/embed/5Z2Cm6_1t6I" }
+      ]
+    },
+    { 
+      id: 15,
+      name: "Artificial Intelligence", 
+      price: 5200, 
+      image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
+      category: "data science", 
+      video: "https://www.youtube.com/embed/JMUxmLyrhSk",
+      description: "Explore the world of AI including machine learning, neural networks, and AI applications.",
+      instructor: "Dr. Alan Turing",
+      duration: "65 hours",
+      level: "Advanced",
+      rating: 4.9,
+      students: 580,
+      lectures: [
+        { title: "AI Introduction", duration: "26:30", video: "https://www.youtube.com/embed/JMUxmLyrhSk" },
+        { title: "Machine Learning Review", duration: "34:45", video: "https://www.youtube.com/embed/KNAWp2S3w94" },
+        { title: "Neural Networks Deep Dive", duration: "39:20", video: "https://www.youtube.com/embed/aircAruvnKk" },
+        { title: "Natural Language Processing", duration: "42:15", video: "https://www.youtube.com/embed/8S3qHHUKqYk" },
+        { title: "AI Ethics & Future", duration: "36:30", video: "https://www.youtube.com/embed/5Z2Cm6_1t6I" }
+      ]
+    }
+  ];
+
+  // Quizzes data
+  let quizzes = JSON.parse(localStorage.getItem('quizzes')) || [
+    {
+      id: 1,
+      title: "Python Basics",
+      description: "Test your knowledge of Python fundamentals.",
+      duration: 10, // minutes
+      questions: [
+        {
+          question: "Which of the following is used to define a function in Python?",
+          options: ["function", "def", "define", "func"],
+          correctAnswer: 1
+        },
+        {
+          question: "What is the output of print(2 ** 3)?",
+          options: ["6", "8", "9", "5"],
+          correctAnswer: 1
+        },
+        {
+          question: "Which data type is mutable in Python?",
+          options: ["int", "string", "tuple", "list"],
+          correctAnswer: 3
+        },
+        {
+          question: "What does the 'len()' function do in Python?",
+          options: ["Converts to lowercase", "Returns the length", "Rounds a number", "Checks if empty"],
+          correctAnswer: 1
+        },
+        {
+          question: "Which keyword is used for conditional statements in Python?",
+          options: ["if", "case", "when", "cond"],
+          correctAnswer: 0
+        }
+      ]
+    },
+    {
+      id: 2,
+      title: "Web Development Fundamentals",
+      description: "Check your understanding of HTML, CSS, and JavaScript basics.",
+      duration: 15,
+      questions: [
+        {
+          question: "Which HTML tag is used for the largest heading?",
+          options: ["<h6>", "<heading>", "<h1>", "<head>"],
+          correctAnswer: 2
+        },
+        {
+          question: "Which CSS property is used to change the text color?",
+          options: ["text-color", "font-color", "color", "text-style"],
+          correctAnswer: 2
+        },
+        {
+          question: "Which symbol is used for comments in JavaScript?",
+          options: ["//", "<!-- -->", "#", "/* */"],
+          correctAnswer: 0
+        },
+        {
+          question: "What does CSS stand for?",
+          options: ["Computer Style Sheets", "Creative Style System", "Cascading Style Sheets", "Colorful Style Sheets"],
+          correctAnswer: 2
+        },
+        {
+          question: "Which HTML attribute is used to define inline styles?",
+          options: ["class", "styles", "font", "style"],
+          correctAnswer: 3
+        }
+      ]
+    },
+    {
+      id: 3,
+      title: "Data Science Concepts",
+      description: "Test your knowledge of data science fundamentals.",
+      duration: 12,
+      questions: [
+        {
+          question: "What is the primary purpose of data cleaning?",
+          options: ["To make data look pretty", "To remove inconsistencies", "To encrypt data", "To compress data"],
+          correctAnswer: 1
+        },
+        {
+          question: "Which of these is a supervised learning algorithm?",
+          options: ["K-means", "PCA", "Linear Regression", "Apriori"],
+          correctAnswer: 2
+        },
+        {
+          question: "What does EDA stand for in data science?",
+          options: ["Extended Data Analysis", "Exploratory Data Analysis", "External Data Assessment", "Expert Data Analytics"],
+          correctAnswer: 1
+        },
+        {
+          question: "Which library is commonly used for data manipulation in Python?",
+          options: ["Matplotlib", "Pandas", "Scikit-learn", "TensorFlow"],
+          correctAnswer: 1
+        },
+        {
+          question: "What is overfitting in machine learning?",
+          options: ["Model too simple", "Model performs well on training but poorly on test data", "Model too slow", "Model uses too many features"],
+          correctAnswer: 1
+        }
+      ]
+    }
+  ];
+
+  // Assignments data
+  let assignments = JSON.parse(localStorage.getItem('assignments')) || [
+    {
+      id: 1,
+      title: "Build a Portfolio Website",
+      description: "Create a personal portfolio website using HTML, CSS, and JavaScript.",
+      dueDate: "2025-04-15",
+      course: "Web Development Bootcamp",
+      status: "pending"
+    },
+    {
+      id: 2,
+      title: "Data Analysis with Python",
+      description: "Analyze a dataset and create visualizations using Python libraries.",
+      dueDate: "2025-04-20",
+      course: "Python for Beginners",
+      status: "pending"
+    },
+    {
+      id: 3,
+      title: "UI Design Project",
+      description: "Design a user interface for a mobile application using design principles.",
+      dueDate: "2025-04-25",
+      course: "UI/UX Design",
+      status: "pending"
+    },
+    {
+      id: 4,
+      title: "Marketing Campaign Plan",
+      description: "Create a comprehensive digital marketing campaign for a product.",
+      dueDate: "2025-04-30",
+      course: "Digital Marketing",
+      status: "pending"
+    },
+    {
+      id: 5,
+      title: "Business Strategy Proposal",
+      description: "Develop a business strategy for a startup company.",
+      dueDate: "2025-05-05",
+      course: "Business Management",
+      status: "pending"
+    }
+  ];
+
+  // Users data (for admin panel)
+  let users = JSON.parse(localStorage.getItem('users')) || [];
+
+  // ---------- Initialization ----------
+  document.addEventListener('DOMContentLoaded', function() {
+    // Apply dark mode if enabled
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+      document.getElementById('dark-mode-toggle').innerHTML = '<i class="fas fa-sun"></i>';
+    }
+    
+    // Initialize charts if on admin panel
+    if (window.location.hash === '#admin-panel') {
+      initializeCharts();
+    }
+    
+    // Load popular courses on home page
+    if (window.location.hash === '#home' || !window.location.hash) {
+      loadPopularCourses();
+    }
+    
+    // Update navbar on scroll
+    window.addEventListener('scroll', function() {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+  });
+
+  // ---------- Navigation ----------
+  function showSection(sectionId){
+    // Hide all sections
+    ['login','signup','home','courses','quiz','assignment','cart','contact','admin-login','admin-panel','video-lectures','profile','quiz-taking','quiz-results','payment','payment-success','certificates','certificate-preview']
+    .forEach(id => {
+      const element = document.getElementById(id);
+      if (element) element.classList.add('hidden');
+    });
+    
+    // Show the requested section
+    document.getElementById(sectionId).classList.remove('hidden');
+    
+    // Show/hide navbar based on section
+    const showNavbar = ['home','courses','quiz','assignment','cart','contact','admin-login','admin-panel','video-lectures','profile','quiz-taking','quiz-results','payment','payment-success','certificates','certificate-preview'].includes(sectionId);
+    document.getElementById('navbar').style.display = showNavbar ? 'flex' : 'none';
+    
+    // Update active nav link
+    document.querySelectorAll('.nav-link-custom').forEach(link => {
+      link.classList.remove('active');
+    });
+    
+    // Special handling for different sections
+    if(sectionId === 'courses') {
+      displayCourses();
+      document.querySelector('a[onclick="showSection(\'courses\')"]').classList.add('active');
+    } else if(sectionId === 'quiz') {
+      displayQuizzes();
+      document.querySelector('a[onclick="showSection(\'quiz\')"]').classList.add('active');
+    } else if(sectionId === 'cart') {
+      updateCart();
+      document.querySelector('a[onclick="showSection(\'cart\')"]').classList.add('active');
+    } else if(sectionId === 'admin-panel') {
+      loadAdminCourses();
+      loadAdminUsers();
+      updateAdminAnalytics();
+      initializeCharts();
+      document.querySelector('a[onclick="showSection(\'admin-login\')"]').classList.add('active');
+    } else if(sectionId === 'home') {
+      loadPopularCourses();
+      document.querySelector('a[onclick="showSection(\'home\')"]').classList.add('active');
+    } else if(sectionId === 'profile') {
+      loadProfile();
+      document.querySelector('a[onclick="showSection(\'profile\')"]').classList.add('active');
+    } else if(sectionId === 'assignment') {
+      displayAssignments();
+      document.querySelector('a[onclick="showSection(\'assignment\')"]').classList.add('active');
+    } else if(sectionId === 'certificates') {
+      displayCertificates();
+      document.querySelector('a[onclick="showSection(\'certificates\')"]').classList.add('active');
+    } else if(sectionId === 'payment') {
+      loadPaymentCart();
+      document.querySelector('a[onclick="showSection(\'cart\')"]').classList.add('active');
+    }
+  }
+
+  // ---------- Dark Mode Toggle ----------
+  document.getElementById('dark-mode-toggle').addEventListener('click', function() {
+    darkMode = !darkMode;
+    document.body.classList.toggle('dark-mode');
+    
+    if (darkMode) {
+      this.innerHTML = '<i class="fas fa-sun"></i>';
+    } else {
+      this.innerHTML = '<i class="fas fa-moon"></i>';
+    }
+    
+    localStorage.setItem('darkMode', darkMode);
+  });
+
+  // ---------- Signup/Login ----------
+  document.getElementById('signup-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    
+    const name = document.getElementById('signup-name').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const confirmPassword = document.getElementById('signup-confirm-password').value;
+    
+    // Validate Gmail
+    if (!isValidGmail(email)) {
+      alert("Please use a valid Gmail address (@gmail.com)");
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+    
+    signedUpUser = {
+      name: name,
+      email: email,
+      password: password
+    };
+    
+    // Add to users list for admin panel
+    users.push({
+      name: name,
+      email: email,
+      joined: new Date().toISOString().split('T')[0],
+      courses: 0,
+      status: 'active'
+    });
+    
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    alert("Signup successful! Please login now.");
+    showSection('login');
+  });
+
+  document.getElementById('login-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    // Validate Gmail
+    if (!isValidGmail(email)) {
+      alert("Please use a valid Gmail address (@gmail.com)");
+      return;
+    }
+    
+    // Check if user exists in localStorage
+    const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
+    const user = storedUsers.find(u => u.email === email);
+    
+    if(user && password === signedUpUser.password){
+      currentUser = {
+        name: user.name,
+        email: user.email
+      };
+      
+      // Load user-specific data from localStorage
+      loadUserData();
+      
+      // Update UI with user info
+      document.getElementById('user-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
+      document.getElementById('username-display').textContent = currentUser.name;
+      
+      alert("Login successful!");
+      showSection('home');
+      updateCart();
+    } else {
+      alert("Invalid credentials or please sign up first.");
+    }
+  });
+
+  // Function to validate Gmail
+  function isValidGmail(email) {
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    return gmailRegex.test(email);
+  }
+
+  function loadUserData() {
+    // Load user-specific data from localStorage
+    const userEmail = currentUser.email;
+    enrolledCourses = JSON.parse(localStorage.getItem(`enrolledCourses_${userEmail}`)) || [];
+    courseProgress = JSON.parse(localStorage.getItem(`courseProgress_${userEmail}`)) || {};
+    quizResults = JSON.parse(localStorage.getItem(`quizResults_${userEmail}`)) || {};
+    certificates = JSON.parse(localStorage.getItem(`certificates_${userEmail}`)) || [];
+  }
+
+  function saveUserData() {
+    // Save user-specific data to localStorage
+    const userEmail = currentUser.email;
+    localStorage.setItem(`enrolledCourses_${userEmail}`, JSON.stringify(enrolledCourses));
+    localStorage.setItem(`courseProgress_${userEmail}`, JSON.stringify(courseProgress));
+    localStorage.setItem(`quizResults_${userEmail}`, JSON.stringify(quizResults));
+    localStorage.setItem(`certificates_${userEmail}`, JSON.stringify(certificates));
+  }
+
+  function logout(){ 
+    alert("You have been logged out."); 
+    currentUser = null; 
+    showSection('login'); 
+  }
+
+  // ---------- Email PDF Download ----------
+  function downloadEmailAsPDF() {
+    if (!currentUser) {
+      alert("Please log in first.");
+      return;
+    }
+    
+    const emailContent = `
+      <div style="padding: 20px; font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #4361ee; margin-bottom: 10px;">LearnHub</h1>
+          <p style="color: #6c757d;">E-Learning Platform</p>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+          <h2 style="color: #4361ee; margin-bottom: 15px;">Account Information</h2>
+          <p><strong>Name:</strong> ${currentUser.name}</p>
+          <p><strong>Email:</strong> ${currentUser.email}</p>
+          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #4361ee; margin-bottom: 15px;">Learning Summary</h3>
+          <p><strong>Courses Enrolled:</strong> ${enrolledCourses.length}</p>
+          <p><strong>Courses Completed:</strong> ${Object.values(courseProgress).filter(progress => progress.progress === 100).length}</p>
+          <p><strong>Certificates Earned:</strong> ${certificates.length}</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #4361ee; margin-bottom: 15px;">Recent Activity</h3>
+          <p>Thank you for being a valued member of LearnHub. Continue your learning journey with us!</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+          <p style="color: #6c757d; font-size: 14px;">&copy; 2025 LearnHub. All rights reserved.</p>
+        </div>
+      </div>
+    `;
+    
+    // Create a temporary element to hold the email content
+    const tempElement = document.createElement('div');
+    tempElement.innerHTML = emailContent;
+    document.body.appendChild(tempElement);
+    
+    // Use html2canvas and jsPDF to generate PDF
+    html2canvas(tempElement, {
+      scale: 2,
+      useCORS: true,
+      logging: false
+    }).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 190;
+      const pageHeight = 295;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      let heightLeft = imgHeight;
+      
+      let position = 10;
+      
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      pdf.save(`learnhub-email-${currentUser.email}.pdf`);
+      
+      // Remove temporary element
+      document.body.removeChild(tempElement);
+    });
+  }
+
+  // ---------- Courses & Enrollment ----------
+  function addToCart(courseId){
+    const course = courses.find(c => c.id === courseId);
+    if (!course) return;
+    
+    // Check if already in cart
+    if (cartItems.find(item => item.id === courseId)) {
+      alert("This course is already in your cart.");
+      return;
+    }
+    
+    // Check if already enrolled
+    if (enrolledCourses.find(item => item.id === courseId)) {
+      alert("You are already enrolled in this course.");
+      return;
+    }
+    
+    cartItems.push(course);
+    totalAmount += course.price;
+    
+    alert(`${course.name} added to My Learning.`);
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    localStorage.setItem('totalAmount', totalAmount);
+    updateCart();
+  }
+
+  function updateCart(){
+    const list = document.getElementById('cart-items');
+    list.innerHTML = '';
+    
+    cartItems.forEach((course, index) => {
+      const li = document.createElement('li');
+      li.className = 'list-group-item d-flex justify-content-between align-items-center';
+      li.innerHTML = `
+        <div>
+          <h6 class="mb-0">${course.name}</h6>
+          <small class="text-muted">${course.instructor}</small>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="me-3">₹${course.price}</span>
+          <button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `;
+      list.appendChild(li);
+    });
+    
+    document.getElementById('total-amount').textContent = totalAmount;
+    document.getElementById('cart-count').textContent = cartItems.length;
+    
+    // Update enrolled courses list
+    updateEnrolledCourses();
+  }
+
+  function removeFromCart(index){
+    totalAmount -= cartItems[index].price;
+    cartItems.splice(index, 1);
+    
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    localStorage.setItem('totalAmount', totalAmount);
+    updateCart();
+  }
+
+  function loadPaymentCart(){
+    const paymentCartItems = document.getElementById('payment-cart-items');
+    paymentCartItems.innerHTML = '';
+    
+    cartItems.forEach(course => {
+      paymentCartItems.innerHTML += `
+        <div class="receipt-item">
+          <span>${course.name}</span>
+          <span>₹${course.price}</span>
+        </div>
+      `;
+    });
+    
+    document.getElementById('payment-total-amount').textContent = totalAmount;
+    
+    // Load shipping address if available
+    if (shippingAddress.name) {
+      document.getElementById('shipping-name').value = shippingAddress.name;
+      document.getElementById('shipping-phone').value = shippingAddress.phone;
+      document.getElementById('shipping-address').value = shippingAddress.address;
+      document.getElementById('shipping-city').value = shippingAddress.city;
+      document.getElementById('shipping-pincode').value = shippingAddress.pincode;
+    }
+  }
+
+  function selectPaymentMethod(method){
+    selectedPaymentMethod = method;
+    
+    // Remove selected class from all payment methods
+    document.querySelectorAll('.payment-method').forEach(pm => {
+      pm.classList.remove('selected');
+    });
+    
+    // Hide all payment forms
+    document.getElementById('card-payment-form').classList.add('hidden');
+    document.getElementById('upi-payment-form').classList.add('hidden');
+    document.getElementById('cod-info').classList.add('hidden');
+    
+    // Add selected class to chosen method
+    document.getElementById(`${method}-payment`).classList.add('selected');
+    
+    // Show relevant form
+    if (method === 'card') {
+      document.getElementById('card-payment-form').classList.remove('hidden');
+    } else if (method === 'upi') {
+      document.getElementById('upi-payment-form').classList.remove('hidden');
+    } else if (method === 'cod') {
+      document.getElementById('cod-info').classList.remove('hidden');
+    }
+  }
+
+  function generateQRCode(){
+    if (!selectedPaymentMethod || selectedPaymentMethod !== 'upi') {
+      alert("Please select UPI payment method first.");
+      return;
+    }
+    
+    const upiURL = `upi://pay?pa=9398288026@ybl&pn=Nishmith&am=${totalAmount}&cu=INR`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiURL)}`;
+    
+    document.getElementById('qr-code').innerHTML = `
+      <div class="card p-3 mx-auto" style="max-width: 350px;">
+        <h5 class="text-center">Scan to Pay</h5>
+        <img src="${qrUrl}" alt="QR Code" class="img-fluid my-3">
+        <p class="text-center">Amount: ₹${totalAmount}</p>
+        <div class="text-center">
+          <button class="btn btn-success" onclick="processPayment()">I've Paid</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function processPayment(){
+    if (!selectedPaymentMethod) {
+      alert("Please select a payment method.");
+      return;
+    }
+    
+    // Validate shipping address
+    const name = document.getElementById('shipping-name').value;
+    const phone = document.getElementById('shipping-phone').value;
+    const address = document.getElementById('shipping-address').value;
+    const city = document.getElementById('shipping-city').value;
+    const pincode = document.getElementById('shipping-pincode').value;
+    
+    if (!name || !phone || !address || !city || !pincode) {
+      alert("Please fill in all shipping address fields.");
+      return;
+    }
+    
+    // Save shipping address
+    shippingAddress = {
+      name: name,
+      phone: phone,
+      address: address,
+      city: city,
+      pincode: pincode
+    };
+    
+    localStorage.setItem('shippingAddress', JSON.stringify(shippingAddress));
+    
+    // Add all cart items to enrolled courses
+    cartItems.forEach(course => {
+      if (!enrolledCourses.find(ec => ec.id === course.id)) {
+        enrolledCourses.push(course);
+        
+        // Initialize progress for the course
+        if (!courseProgress[course.id]) {
+          courseProgress[course.id] = {
+            completedLectures: [],
+            progress: 0
+          };
+        }
+        
+        // Generate certificate for the course
+        generateCertificate(course);
+      }
+    });
+    
+    // Clear cart
+    cartItems = [];
+    totalAmount = 0;
+    
+    // Update storage
+    saveUserData();
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    localStorage.setItem('totalAmount', totalAmount);
+    
+    // Show payment success and receipt
+    showPaymentSuccess();
+  }
+
+  function showPaymentSuccess(){
+    showSection('payment-success');
+    
+    // Generate order ID
+    const orderId = 'LH-' + Date.now();
+    document.getElementById('receipt-order-id').textContent = orderId;
+    
+    // Set current date
+    const today = new Date();
+    document.getElementById('receipt-date').textContent = today.toLocaleDateString();
+    
+    // Set payment method
+    let paymentMethodText = '';
+    if (selectedPaymentMethod === 'card') {
+      paymentMethodText = 'Credit/Debit Card';
+    } else if (selectedPaymentMethod === 'upi') {
+      paymentMethodText = 'UPI Payment';
+    } else if (selectedPaymentMethod === 'cod') {
+      paymentMethodText = 'Cash on Delivery';
+    }
+    document.getElementById('receipt-payment-method').textContent = paymentMethodText;
+    
+    // Load receipt items
+    const receiptItems = document.getElementById('receipt-items');
+    receiptItems.innerHTML = '';
+    
+    enrolledCourses.forEach(course => {
+      receiptItems.innerHTML += `
+        <div class="receipt-item">
+          <span>${course.name}</span>
+          <span>₹${course.price}</span>
+        </div>
+      `;
+    });
+    
+    // Set total amount
+    const receiptTotal = enrolledCourses.reduce((sum, course) => sum + course.price, 0);
+    document.getElementById('receipt-total').textContent = receiptTotal;
+    
+    // Set shipping address
+    document.getElementById('receipt-shipping-address').textContent = 
+      `${shippingAddress.name}, ${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.pincode}`;
+  }
+
+  function downloadReceiptAsPDF(){
+    const receiptContainer = document.querySelector('.receipt-container');
+    
+    html2canvas(receiptContainer).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 190;
+      const pageHeight = 295;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      let heightLeft = imgHeight;
+      
+      let position = 10;
+      
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      pdf.save(`learnhub-receipt-${document.getElementById('receipt-order-id').textContent}.pdf`);
+    });
+  }
+
+  function displayCourses(filteredCourses = courses){
+    const list = document.getElementById("course-list");
+    list.innerHTML = '';
+    
+    if (filteredCourses.length === 0) {
+      list.innerHTML = '<div class="col-12 text-center"><p>No courses found matching your criteria.</p></div>';
+      return;
+    }
+    
+    filteredCourses.forEach(course => {
+      const isEnrolled = enrolledCourses.find(ec => ec.id === course.id);
+      const progress = courseProgress[course.id] ? courseProgress[course.id].progress : 0;
+      
+      list.innerHTML += `
+        <div class="col-md-6 col-lg-4">
+          <div class="card course-card h-100">
+            <div class="position-relative">
+              <img src="${course.image}" class="card-img-top" alt="${course.name}">
+              <span class="category-badge">${course.category}</span>
+              ${isEnrolled ? '<span class="enrolled-badge">Enrolled</span>' : ''}
+              ${isEnrolled && progress > 0 ? `
+                <div class="course-progress">
+                  <div class="d-flex justify-content-between">
+                    <span>Progress</span>
+                    <span>${progress}%</span>
+                  </div>
+                  <div class="progress-container">
+                    <div class="progress-bar" style="width: ${progress}%"></div>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">${course.name}</h5>
+              <p class="card-text text-muted course-description">${course.description}</p>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <small class="text-muted"><i class="fas fa-user me-1"></i>${course.instructor}</small>
+                <small class="text-muted"><i class="fas fa-clock me-1"></i>${course.duration}</small>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <i class="fas fa-star text-warning"></i>
+                  <span class="ms-1">${course.rating}</span>
+                  <span class="text-muted">(${course.students})</span>
+                </div>
+                <span class="fw-bold text-primary">₹${course.price}</span>
+              </div>
+              ${isEnrolled ? 
+                `<button class="btn btn-primary w-100" onclick="watchCourse(${course.id})">
+                  <i class="fas fa-play-circle me-2"></i>Continue Learning
+                </button>` : 
+                `<button class="btn btn-success w-100" onclick="addToCart(${course.id})">
+                  <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                </button>`
+              }
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  function watchCourse(courseId){
+    const course = enrolledCourses.find(c => c.id === courseId);
+    if(!course){ 
+      alert("Please enroll in this course first."); 
+      return; 
+    }
+    
+    showSection('video-lectures');
+    displayCourseLectures(course);
+  }
+
+  function displayCourseLectures(course){
+    document.getElementById('lecture-course-title').textContent = course.name;
+    
+    const lectureList = document.getElementById('lecture-list');
+    lectureList.innerHTML = '';
+    
+    // Get progress for this course
+    const progress = courseProgress[course.id] || { completedLectures: [], progress: 0 };
+    
+    course.lectures.forEach((lecture, index) => {
+      const isCompleted = progress.completedLectures.includes(index);
+      const isActive = index === 0; // Default to first lecture
+      
+      const lectureItem = document.createElement('div');
+      lectureItem.className = `lecture-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed-lecture' : ''}`;
+      lectureItem.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="mb-0">${index + 1}. ${lecture.title}</h6>
+            <small class="text-muted">${lecture.duration}</small>
+          </div>
+          ${isCompleted ? '<i class="fas fa-check-circle text-success"></i>' : ''}
+        </div>
+      `;
+      
+      lectureItem.addEventListener('click', function() {
+        // Remove active class from all lectures
+        document.querySelectorAll('.lecture-item').forEach(item => {
+          item.classList.remove('active');
+        });
+        
+        // Add active class to clicked lecture
+        this.classList.add('active');
+        
+        // Load the lecture video
+        loadLectureVideo(course, lecture, index);
+      });
+      
+      lectureList.appendChild(lectureItem);
+    });
+    
+    // Load the first lecture by default
+    if (course.lectures.length > 0) {
+      loadLectureVideo(course, course.lectures[0], 0);
+    }
+  }
+
+  function loadLectureVideo(course, lecture, lectureIndex){
+    const videoContainer = document.getElementById('video-container');
+    
+    // Check if user is enrolled in this course
+    const isEnrolled = enrolledCourses.find(ec => ec.id === course.id);
+    
+    if (!isEnrolled) {
+      videoContainer.innerHTML = `
+        <div class="locked-content">
+          <div class="youtube-container">
+            <iframe src="${lecture.video}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <div class="locked-overlay">
+            <div class="locked-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <h4>This content is locked</h4>
+            <p>Enroll in this course to access all lectures</p>
+            <button class="btn btn-primary mt-3" onclick="addToCart(${course.id})">Enroll Now</button>
+          </div>
+        </div>
+      `;
+    } else {
+      videoContainer.innerHTML = `
+        <div class="youtube-container">
+          <iframe src="${lecture.video}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      `;
+      
+      // Mark as completed when video ends (simulated)
+      setTimeout(function() {
+        markLectureAsCompleted(course.id, lectureIndex);
+      }, 5000); // Simulate video completion after 5 seconds
+    }
+    
+    document.getElementById('current-lecture-title').textContent = lecture.title;
+    document.getElementById('current-lecture-description').textContent = `Part of the "${course.name}" course. Duration: ${lecture.duration}`;
+  }
+
+  function markLectureAsCompleted(courseId, lectureIndex){
+    if (!courseProgress[courseId]) {
+      courseProgress[courseId] = {
+        completedLectures: [],
+        progress: 0
+      };
+    }
+    
+    // Add to completed lectures if not already there
+    if (!courseProgress[courseId].completedLectures.includes(lectureIndex)) {
+      courseProgress[courseId].completedLectures.push(lectureIndex);
+      
+      // Calculate progress percentage
+      const course = courses.find(c => c.id === courseId);
+      if (course) {
+        const totalLectures = course.lectures.length;
+        const completedLectures = courseProgress[courseId].completedLectures.length;
+        courseProgress[courseId].progress = Math.round((completedLectures / totalLectures) * 100);
+        
+        // Check if course is completed and generate certificate if needed
+        if (courseProgress[courseId].progress === 100) {
+          generateCertificate(course);
+        }
+      }
+      
+      // Update storage
+      saveUserData();
+      
+      // Update UI
+      const lectureItems = document.querySelectorAll('.lecture-item');
+      if (lectureIndex < lectureItems.length) {
+        lectureItems[lectureIndex].classList.add('completed-lecture');
+        const icon = lectureItems[lectureIndex].querySelector('i');
+        if (icon) {
+          icon.classList.add('fa-check-circle', 'text-success');
+        }
+      }
+    }
+  }
+
+  function filterCourses(){
+    const category = document.getElementById("categorySelect").value;
+    const filtered = category === "all" ? courses : courses.filter(c => c.category === category);
+    displayCourses(filtered);
+  }
+
+  function searchCourses(){
+    const searchTerm = document.getElementById("search-course").value.toLowerCase();
+    const filtered = courses.filter(c => 
+      c.name.toLowerCase().includes(searchTerm) || 
+      c.description.toLowerCase().includes(searchTerm) ||
+      c.instructor.toLowerCase().includes(searchTerm)
+    );
+    displayCourses(filtered);
+  }
+
+  function loadPopularCourses(){
+    const popularCoursesContainer = document.getElementById("popular-courses");
+    if (!popularCoursesContainer) return;
+    
+    // Sort courses by student count (popularity)
+    const popularCourses = [...courses].sort((a, b) => b.students - a.students).slice(0, 3);
+    
+    popularCoursesContainer.innerHTML = '';
+    
+    popularCourses.forEach(course => {
+      const isEnrolled = enrolledCourses.find(ec => ec.id === course.id);
+      
+      popularCoursesContainer.innerHTML += `
+        <div class="col-md-4">
+          <div class="card course-card h-100">
+            <img src="${course.image}" class="card-img-top" alt="${course.name}">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">${course.name}</h5>
+              <p class="card-text text-muted course-description">${course.description.substring(0, 100)}...</p>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <small class="text-muted"><i class="fas fa-user me-1"></i>${course.instructor}</small>
+                <small class="text-muted"><i class="fas fa-clock me-1"></i>${course.duration}</small>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="fas fa-star text-warning"></i>
+                  <span class="ms-1">${course.rating}</span>
+                </div>
+                <span class="fw-bold text-primary">₹${course.price}</span>
+              </div>
+              ${isEnrolled ? 
+                `<button class="btn btn-primary w-100 mt-3" onclick="watchCourse(${course.id})">
+                  <i class="fas fa-play-circle me-2"></i>Continue
+                </button>` : 
+                `<button class="btn btn-success w-100 mt-3" onclick="addToCart(${course.id})">
+                  <i class="fas fa-cart-plus me-2"></i>Enroll Now
+                </button>`
+              }
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  function updateEnrolledCourses(){
+    const enrolledList = document.getElementById("enrolled-courses-list");
+    if (!enrolledList) return;
+    
+    enrolledList.innerHTML = '';
+    
+    if (enrolledCourses.length === 0) {
+      enrolledList.innerHTML = '<p class="text-muted text-center">You are not enrolled in any courses yet.</p>';
+      return;
+    }
+    
+    enrolledCourses.forEach(course => {
+      const progress = courseProgress[course.id] ? courseProgress[course.id].progress : 0;
+      
+      enrolledList.innerHTML += `
+        <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+          <div>
+            <h6 class="mb-0">${course.name}</h6>
+            <small class="text-muted">${course.instructor}</small>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="me-3" style="width: 100px;">
+              <div class="progress-container">
+                <div class="progress-bar" style="width: ${progress}%"></div>
+              </div>
+              <small>${progress}% complete</small>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="watchCourse(${course.id})">
+              <i class="fas fa-play"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    
+    // Update statistics
+    document.getElementById('enrolled-count').textContent = enrolledCourses.length;
+    
+    const completedCount = Object.values(courseProgress).filter(progress => progress.progress === 100).length;
+    document.getElementById('completed-count').textContent = completedCount;
+    
+    // Calculate learning hours (simplified)
+    const learningHours = enrolledCourses.reduce((total, course) => {
+      const hours = parseInt(course.duration);
+      return total + (isNaN(hours) ? 0 : hours);
+    }, 0);
+    document.getElementById('learning-hours').textContent = learningHours;
+  }
+
+  // ---------- Certificates ----------
+  function generateCertificate(course){
+    // Check if certificate already exists
+    if (certificates.find(c => c.courseId === course.id)) {
+      return;
+    }
+    
+    const certificate = {
+      id: 'CERT-' + Date.now(),
+      courseId: course.id,
+      courseName: course.name,
+      studentName: currentUser ? currentUser.name : 'Student',
+      instructor: "Nishmith Reddy",
+      date: new Date().toLocaleDateString(),
+      grade: calculateGrade(course.id)
+    };
+    
+    certificates.push(certificate);
+    saveUserData();
+  }
+
+  function calculateGrade(courseId){
+    // In a real application, this would calculate based on quiz scores, assignments, etc.
+    // For now, we'll return a random grade
+    const grades = ['A+', 'A', 'B+', 'B', 'C+'];
+    return grades[Math.floor(Math.random() * grades.length)];
+  }
+
+  function displayCertificates(){
+    const certificatesList = document.getElementById("certificates-list");
+    certificatesList.innerHTML = '';
+    
+    if (certificates.length === 0) {
+      certificatesList.innerHTML = `
+        <div class="col-12 text-center">
+          <div class="card p-5">
+            <i class="fas fa-certificate fa-4x text-muted mb-3"></i>
+            <h4>No Certificates Yet</h4>
+            <p class="text-muted">Complete courses to earn certificates.</p>
+            <button class="btn btn-primary" onclick="showSection('courses')">Browse Courses</button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    
+    certificates.forEach(certificate => {
+      certificatesList.innerHTML += `
+        <div class="col-md-6 col-lg-4">
+          <div class="certificate-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">${certificate.courseName}</h5>
+              <span class="badge bg-success">${certificate.grade}</span>
+            </div>
+            <p class="text-muted">Issued to: ${certificate.studentName}</p>
+            <p class="text-muted">Date: ${certificate.date}</p>
+            <div class="d-flex justify-content-between">
+              <button class="btn btn-outline-primary btn-sm" onclick="previewCertificate('${certificate.id}')">
+                <i class="fas fa-eye me-1"></i>Preview
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="downloadCertificateById('${certificate.id}')">
+                <i class="fas fa-download me-1"></i>Download
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  function previewCertificate(certificateId){
+    const certificate = certificates.find(c => c.id === certificateId);
+    if (!certificate) return;
+    
+    document.getElementById('certificate-student-name').textContent = certificate.studentName;
+    document.getElementById('certificate-course-name').textContent = certificate.courseName;
+    document.getElementById('certificate-grade').textContent = certificate.grade;
+    document.getElementById('certificate-instructor').textContent = certificate.instructor;
+    document.getElementById('certificate-date').textContent = certificate.date;
+    document.getElementById('certificate-id').textContent = certificate.id;
+    
+    showSection('certificate-preview');
+  }
+
+  function downloadCertificate(){
+    const certificateElement = document.getElementById('certificate-template');
+    
+    html2canvas(certificateElement).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = 'learnhub-certificate.png';
+      link.href = imgData;
+      link.click();
+    });
+  }
+
+  function downloadCertificateById(certificateId){
+    const certificate = certificates.find(c => c.id === certificateId);
+    if (!certificate) return;
+    
+    // In a real application, this would generate a PDF certificate
+    // For now, we'll create a simple downloadable text file
+    const certificateContent = `
+LEARNHUB CERTIFICATE OF COMPLETION
+
+This is to certify that
+${certificate.studentName}
+has successfully completed the course
+"${certificate.courseName}"
+with a grade of ${certificate.grade}
+
+Instructor: ${certificate.instructor}
+Date: ${certificate.date}
+Certificate ID: ${certificate.id}
+
+LearnHub - Advancing Education Worldwide
+    `;
+    
+    const blob = new Blob([certificateContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = `certificate-${certificate.courseName.replace(/\s+/g, '-').toLowerCase()}.txt`;
+    link.href = url;
+    link.click();
+  }
+
+  function generateAllCertificates(){
+    if (certificates.length === 0) {
+      alert("You don't have any certificates yet.");
+      return;
+    }
+    
+    // In a real application, this would generate a ZIP file with all certificates
+    alert("All certificates are being prepared for download. This feature would generate a ZIP file with all your certificates in a real application.");
+  }
+
+  // ---------- Quizzes ----------
+  let currentQuiz = null;
+  let currentQuestionIndex = 0;
+  let userAnswers = [];
+  let quizTimer = null;
+  let timeLeft = 0;
+
+  function displayQuizzes(){
+    const quizList = document.getElementById("quiz-list");
+    quizList.innerHTML = '';
+    
+    quizzes.forEach(quiz => {
+      const userResult = quizResults[quiz.id];
+      
+      quizList.innerHTML += `
+        <div class="col-md-6">
+          <div class="card p-4 feature-card h-100">
+            <h5>${quiz.title}</h5>
+            <p class="text-muted">${quiz.description}</p>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <small class="text-muted"><i class="fas fa-question-circle me-1"></i>${quiz.questions.length} questions</small>
+              <small class="text-muted"><i class="fas fa-clock me-1"></i>${quiz.duration} min</small>
+            </div>
+            ${userResult ? `
+              <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                  <span>Your Score</span>
+                  <span>${userResult.score}/${quiz.questions.length}</span>
+                </div>
+                <div class="progress-container">
+                  <div class="progress-bar" style="width: ${(userResult.score / quiz.questions.length) * 100}%"></div>
+                </div>
+              </div>
+            ` : ''}
+            <button class="btn btn-primary w-100" onclick="startQuiz(${quiz.id})">
+              ${userResult ? 'Retake Quiz' : 'Start Quiz'}
+            </button>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  function startQuiz(quizId){
+    currentQuiz = quizzes.find(q => q.id === quizId);
+    if (!currentQuiz) return;
+    
+    currentQuestionIndex = 0;
+    userAnswers = new Array(currentQuiz.questions.length).fill(null);
+    timeLeft = currentQuiz.duration * 60; // Convert to seconds
+    
+    showSection('quiz-taking');
+    displayQuestion();
+    startTimer();
+  }
+
+  function displayQuestion(){
+    if (!currentQuiz || currentQuestionIndex >= currentQuiz.questions.length) {
+      endQuiz();
+      return;
+    }
+    
+    const question = currentQuiz.questions[currentQuestionIndex];
+    const quizContainer = document.getElementById('quiz-question-container');
+    
+    quizContainer.innerHTML = `
+      <h5 class="mb-4">${question.question}</h5>
+      <div id="quiz-options">
+        ${question.options.map((option, index) => `
+          <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}" 
+               onclick="selectAnswer(${index})">
+            ${String.fromCharCode(65 + index)}. ${option}
+          </div>
+        `).join('')}
+      </div>
+    `;
+    
+    // Update progress
+    document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+    document.getElementById('total-questions').textContent = currentQuiz.questions.length;
+    document.getElementById('quiz-progress').style.width = `${((currentQuestionIndex + 1) / currentQuiz.questions.length) * 100}%`;
+    
+    // Update navigation buttons
+    document.getElementById('prev-question').disabled = currentQuestionIndex === 0;
+    document.getElementById('next-question').style.display = currentQuestionIndex < currentQuiz.questions.length - 1 ? 'block' : 'none';
+    document.getElementById('submit-quiz').classList.toggle('hidden', currentQuestionIndex < currentQuiz.questions.length - 1);
+  }
+
+  function selectAnswer(optionIndex){
+    userAnswers[currentQuestionIndex] = optionIndex;
+    
+    // Update UI to show selected option
+    document.querySelectorAll('#quiz-options .quiz-option').forEach((option, index) => {
+      option.classList.toggle('selected', index === optionIndex);
+    });
+  }
+
+  function nextQuestion(){
+    if (currentQuestionIndex < currentQuiz.questions.length - 1) {
+      currentQuestionIndex++;
+      displayQuestion();
+    }
+  }
+
+  function previousQuestion(){
+    if (currentQuestionIndex > 0) {
+      currentQuestionIndex--;
+      displayQuestion();
+    }
+  }
+
+  function startTimer(){
+    updateTimerDisplay();
+    
+    quizTimer = setInterval(function() {
+      timeLeft--;
+      updateTimerDisplay();
+      
+      if (timeLeft <= 0) {
+        endQuiz();
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay(){
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    document.getElementById('quiz-timer').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  function submitQuiz(){
+    endQuiz();
+  }
+
+  function endQuiz(){
+    clearInterval(quizTimer);
+    
+    // Calculate score
+    let score = 0;
+    currentQuiz.questions.forEach((question, index) => {
+      if (userAnswers[index] === question.correctAnswer) {
+        score++;
+      }
+    });
+    
+    // Save result
+    quizResults[currentQuiz.id] = {
+      score: score,
+      total: currentQuiz.questions.length,
+      date: new Date().toISOString()
+    };
+    
+    saveUserData();
+    
+    // Show results
+    showQuizResults(score);
+  }
+
+  function showQuizResults(score){
+    showSection('quiz-results');
+    
+    const percentage = (score / currentQuiz.questions.length) * 100;
+    
+    document.getElementById('quiz-score').textContent = `${score}/${currentQuiz.questions.length}`;
+    document.getElementById('score-progress').style.width = `${percentage}%`;
+    document.getElementById('score-percentage').textContent = `${Math.round(percentage)}%`;
+  }
+
+  function reviewQuiz(){
+    // This would show a detailed review of all questions and answers
+    alert("Review feature would show each question with your answer and the correct answer.");
+  }
+
+  // ---------- Assignments ----------
+  function displayAssignments(){
+    const assignmentList = document.getElementById("assignment-list");
+    assignmentList.innerHTML = '';
+    
+    assignments.forEach(assignment => {
+      assignmentList.innerHTML += `
+        <div class="col-md-6">
+          <div class="card p-4 feature-card h-100">
+            <h5>${assignment.title}</h5>
+            <p class="text-muted">${assignment.description}</p>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <small class="text-muted"><i class="fas fa-book me-1"></i>${assignment.course}</small>
+              <small class="text-muted"><i class="fas fa-calendar me-1"></i>Due: ${assignment.dueDate}</small>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="badge ${assignment.status === 'pending' ? 'bg-warning' : 'bg-success'}">
+                ${assignment.status}
+              </span>
+              <button class="btn btn-primary" onclick="uploadAssignment(${assignment.id})">
+                <i class="fas fa-upload me-2"></i>Upload
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  function uploadAssignment(assignmentId){
+    // In a real application, this would open a file upload dialog
+    const assignment = assignments.find(a => a.id === assignmentId);
+    if (assignment) {
+      assignment.status = 'submitted';
+      localStorage.setItem('assignments', JSON.stringify(assignments));
+      displayAssignments();
+      alert(`Assignment "${assignment.title}" submitted successfully!`);
+    }
+  }
+
+  // ---------- Profile ----------
+  function loadProfile(){
+    if (!currentUser) return;
+    
+    document.getElementById('profile-name').textContent = currentUser.name;
+    document.getElementById('profile-email').textContent = currentUser.email;
+    document.getElementById('profile-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
+    
+    loadProfileProgress();
+    loadRecentActivity();
+  }
+
+  function loadProfileProgress(){
+    const profileProgress = document.getElementById('profile-progress');
+    profileProgress.innerHTML = '';
+    
+    if (enrolledCourses.length === 0) {
+      profileProgress.innerHTML = '<p class="text-muted">You are not enrolled in any courses yet.</p>';
+      return;
+    }
+    
+    enrolledCourses.forEach(course => {
+      const progress = courseProgress[course.id] ? courseProgress[course.id].progress : 0;
+      
+      profileProgress.innerHTML += `
+        <div class="mb-4">
+          <div class="d-flex justify-content-between mb-2">
+            <h6 class="mb-0">${course.name}</h6>
+            <span>${progress}%</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: ${progress}%"></div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  function loadRecentActivity(){
+    const recentActivity = document.getElementById('recent-activity');
+    recentActivity.innerHTML = '';
+    
+    // Add some sample activities
+    const activities = [
+      { type: 'enrollment', course: 'Web Development', date: '2 days ago' },
+      { type: 'completion', course: 'Python for Beginners', date: '1 week ago' },
+      { type: 'quiz', course: 'Python Basics', score: '8/10', date: '3 days ago' }
+    ];
+    
+    activities.forEach(activity => {
+      let icon, text, color;
+      
+      switch(activity.type) {
+        case 'enrollment':
+          icon = 'fas fa-book';
+          text = `Enrolled in ${activity.course}`;
+          color = 'primary';
+          break;
+        case 'completion':
+          icon = 'fas fa-check-circle';
+          text = `Completed ${activity.course}`;
+          color = 'success';
+          break;
+        case 'quiz':
+          icon = 'fas fa-question-circle';
+          text = `Scored ${activity.score} on ${activity.course} quiz`;
+          color = 'info';
+          break;
+      }
+      
+      recentActivity.innerHTML += `
+        <div class="d-flex align-items-center mb-3">
+          <div class="bg-${color} text-white rounded-circle p-2 me-3">
+            <i class="${icon}"></i>
+          </div>
+          <div>
+            <p class="mb-0">${text}</p>
+            <small class="text-muted">${activity.date}</small>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  function editProfile(){
+    // In a real application, this would open an edit form
+    alert("Edit profile feature would open a form to update user information.");
+  }
+
+  // ---------- Contact ----------
+  document.getElementById('contact-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    alert(`Thanks, ${name}! We will reach out soon.`);
+  });
+
+  // ---------- Admin ----------
+  document.getElementById('admin-login-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const username = document.getElementById('admin-username').value;
+    const password = document.getElementById('admin-password').value;
+    
+    if(username === "admin" && password === "admin123"){ 
+      alert("Admin login successful"); 
+      showSection('admin-panel'); 
+    } else { 
+      alert("Invalid admin credentials."); 
+    }
+  });
+
+  document.getElementById('add-course-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    
+    // Generate a new ID
+    const newId = courses.length > 0 ? Math.max(...courses.map(c => c.id)) + 1 : 1;
+    
+    const course = {
+      id: newId,
+      name: document.getElementById('course-name').value,
+      price: parseInt(document.getElementById('course-price').value),
+      category: document.getElementById('course-category').value,
+      image: document.getElementById('course-image').value,
+      video: document.getElementById('course-video').value,
+      description: document.getElementById('course-description').value,
+      instructor: "Instructor Name", // In a real app, this would be input
+      duration: "40 hours", // In a real app, this would be calculated
+      level: "Beginner", // In a real app, this would be selected
+      rating: 4.5, // In a real app, this would be calculated
+      students: 0, // In a real app, this would start at 0
+      lectures: [
+        { title: "Introduction", duration: "10:00", video: document.getElementById('course-video').value }
+      ]
+    };
+    
+    courses.push(course);
+    localStorage.setItem('courses', JSON.stringify(courses));
+    loadAdminCourses();
+    alert("Course added successfully!");
+    
+    // Reset form
+    document.getElementById('add-course-form').reset();
+  });
+
+  function loadAdminCourses(){
+    const list = document.getElementById('admin-course-list');
+    list.innerHTML = '';
+    
+    courses.forEach(course => {
+      const enrollments = enrolledCourses.filter(ec => ec.id === course.id).length;
+      
+      list.innerHTML += `
+        <tr>
+          <td>${course.name}</td>
+          <td>₹${course.price}</td>
+          <td>${course.category}</td>
+          <td>${enrollments}</td>
+          <td>
+            <button class="btn btn-sm btn-danger" onclick="deleteCourse(${course.id})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  function loadAdminUsers(){
+    const list = document.getElementById('admin-user-list');
+    list.innerHTML = '';
+    
+    // Add the signed up user to the list if exists
+    if (signedUpUser && !users.find(u => u.email === signedUpUser.email)) {
+      users.push({
+        name: signedUpUser.name,
+        email: signedUpUser.email,
+        joined: new Date().toISOString().split('T')[0],
+        courses: enrolledCourses.length,
+        status: 'active'
+      });
+    }
+    
+    users.forEach(user => {
+      list.innerHTML += `
+        <tr>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>${user.joined}</td>
+          <td>${user.courses}</td>
+          <td><span class="badge bg-success">${user.status}</span></td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary me-1">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger">
+              <i class="fas fa-ban"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  function updateAdminAnalytics(){
+    document.getElementById('total-users').textContent = users.length;
+    document.getElementById('total-courses').textContent = courses.length;
+    
+    const totalEnrollments = enrolledCourses.length;
+    document.getElementById('total-enrollments').textContent = totalEnrollments;
+    
+    const totalRevenue = enrolledCourses.reduce((sum, course) => sum + course.price, 0);
+    document.getElementById('total-revenue').textContent = totalRevenue;
+  }
+
+  function initializeCharts(){
+    // Course popularity chart
+    const courseCtx = document.getElementById('courseChart').getContext('2d');
+    const courseNames = courses.map(c => c.name);
+    const courseEnrollments = courses.map(c => enrolledCourses.filter(ec => ec.id === c.id).length);
+    
+    new Chart(courseCtx, {
+      type: 'bar',
+      data: {
+        labels: courseNames,
+        datasets: [{
+          label: 'Enrollments',
+          data: courseEnrollments,
+          backgroundColor: 'rgba(67, 97, 238, 0.7)',
+          borderColor: 'rgba(67, 97, 238, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+    
+    // User growth chart (simulated data)
+    const userCtx = document.getElementById('userChart').getContext('2d');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    const userGrowth = [10, 25, 40, 60, 85, users.length];
+    
+    new Chart(userCtx, {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [{
+          label: 'Users',
+          data: userGrowth,
+          backgroundColor: 'rgba(76, 201, 240, 0.2)',
+          borderColor: 'rgba(76, 201, 240, 1)',
+          borderWidth: 2,
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+
+  function deleteCourse(courseId){
+    if(confirm("Are you sure you want to delete this course?")){
+      courses = courses.filter(c => c.id !== courseId);
+      localStorage.setItem('courses', JSON.stringify(courses));
+      loadAdminCourses();
+    }
+  }
+
+  // Start with signup page
+  showSection('signup');
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>
